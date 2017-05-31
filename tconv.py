@@ -47,17 +47,17 @@ tail = """
 # map doodle's values to our values
 value_mapping = {
     "OK": " &#10004; ",
-    "ifneedbe": "(&#10004;)",
+    "(OK)": "(&#10004;)",
     "": "          ",
 }
 
 
 def mapping(value: str) -> str:
-    return value_mapping.get(value, default=value)
+    return value_mapping.get(value, value)
 
 # process csv
 output = head
-reader = csv.reader(sys.argv[0])
+reader = csv.reader(open(sys.argv[1], "r"))
 for row in reader:
     output += template.format(*map(mapping, row))
 output += tail
