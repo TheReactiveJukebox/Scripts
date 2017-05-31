@@ -23,31 +23,29 @@ head = """
       <td>8</td><td>10</td><td>12</td><td>14</td><td>16</td>
     </tr>
   </thead>
-  <tbody>
 """
 
 # template for new person
 template = """
-    <tr>
-      <td>{}</td>
-      <td>{}</td><td>{}</td><td>{}</td><td>{}</td><td>{}</td>
-      <td>{}</td><td>{}</td><td>{}</td><td>{}</td><td>{}</td>
-      <td>{}</td><td>{}</td><td>{}</td><td>{}</td><td>{}</td>
-      <td>{}</td><td>{}</td><td>{}</td><td>{}</td><td>{}</td>
-      <td>{}</td><td>{}</td><td>{}</td><td>{}</td><td>{}</td>
-    </tr>
+  <tr>
+    <td>{}</td>
+    <td>{}</td><td>{}</td><td>{}</td><td>{}</td><td>{}</td>
+    <td>{}</td><td>{}</td><td>{}</td><td>{}</td><td>{}</td>
+    <td>{}</td><td>{}</td><td>{}</td><td>{}</td><td>{}</td>
+    <td>{}</td><td>{}</td><td>{}</td><td>{}</td><td>{}</td>
+    <td>{}</td><td>{}</td><td>{}</td><td>{}</td><td>{}</td>
+  </tr>
 """
 
 # closing tags at the end of the table
 tail = """
-  </tbody>
 </table>
 """
 
 # map doodle's values to our values
 value_mapping = {
     "OK": " &#10004; ",
-    "(OK)": "(&#10004;)",
+    "(OK)": " &#10033; ",
     "": "          ",
 }
 
