@@ -1,23 +1,24 @@
-#!/usr/bin/env python3
-
 import os
 
 from mutagen.easyid3 import EasyID3
 import mutagen
 import psycopg2
 
+# Hopefully no song will be called like this ;)
+SKIP = "1c73b71e7e1364f2eda6007749a93fe9dc90b844b27a121de985e78b1aa3aa82"
+
 
 def normalize_name(name: str):
-    before = name
     name = name.replace(" ", "")
     name = name.lower()
     name = name.replace("ö", "o")
     name = name.replace("ü", "u")
     name = name.replace("ä", "a")
     name = name.replace("ß", "s")
-    name = ''.join(e for e in name if e.isalnum())
-    if name == '':
-        return before
+    name = ''.join(e for e in name if ord(e) < 128)     # Non-ASCII-Characters should not be included in normalized name
+    name = ''.join(e for e in name if e.isalnum())      # Remove all special characters
+    if name == '':      # If no normalized name remains, e.g. with '...', don't include the entry in the database
+        return SKIP
     return name
 
 
@@ -92,10 +93,21 @@ for i in chars:
             songHash = (i + j + file)[:-4]
             title = audio["title"][0]
             titleNorm = normalize_name(title)
-            artist = audio["artist"]
-            artistNorm = normalize_name_list(artist)
+            if titleNorm == SKIP:
+                print(("Title:", title, titleNorm))
+                continue
+            artist = audio["artist"][0]
+            artistNorm = normalize_name(artist)
+            if SKIP in artistNorm:
+                print(("Artist:", artist, artistNorm))
+                continue
             album = audio["album"][0]
             albumNorm = normalize_name(album)
+            if albumNorm == SKIP:
+                print(("Album:", album, albumNorm))
+                continue
+
+            # print((length, songHash, title, titleNorm, artist, artistNorm, album, albumNorm))
 
             cur.execute("EXECUTE insert_artist (%s, %s)", (artistNorm, artist))
             artistid = cur.fetchone()[0]
