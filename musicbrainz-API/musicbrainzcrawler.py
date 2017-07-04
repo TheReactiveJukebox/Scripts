@@ -1,12 +1,14 @@
 from __future__ import unicode_literals
-import musicbrainzngs
-import sys
-import json
 
-artist='AC/DC'
-#track='Hells+Bells'
-#tag='rock'
-album='Back in Black'
+import json
+import sys
+
+import musicbrainzngs
+
+artist = 'AC/DC'
+# track='Hells+Bells'
+# tag='rock'
+album = 'Back in Black'
 
 # User-Agent string is needed for every request: App name, apps version number,
 # contact-url or -email. This is an example:
@@ -29,7 +31,6 @@ def show_release_details(rel):
     print("MusicBrainz ID: {}".format(rel['id']))
 
 
-
 def search():
     # Keyword arguments to the "search_*" functions limit keywords to
     # specific fields. The "limit" keyword argument is special (like as
@@ -37,16 +38,16 @@ def search():
     # return.
     result = musicbrainzngs.search_releases(artist=artist, release=album,
                                             limit=5)
-    
+
     # On success, result is a dictionary with a single key:
     # "release-list", which is a list of dictionaries.
     if not result['release-list']:
         sys.exit("no release found")
     for (idx, release) in enumerate(result['release-list']):
-        print("match #{}:".format(idx+1))
+        print("match #{}:".format(idx + 1))
         show_release_details(release)
-    print ' '
+    print(' ')
     print(json.dumps(result, indent=4))
-    
+
 
 search()
