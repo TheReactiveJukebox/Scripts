@@ -67,6 +67,7 @@ cur.execute("PREPARE connect_song_artist AS "
 
 file_in = open("data.csv", "r")
 data = csv.reader(file_in)
+next(data)      # skip first line containing headlines for each column
 for row in data:        # row has the structure: [title, artist, album, songHash, length]
     titleNorm = normalize_name(row[0])
     if titleNorm == SKIP:

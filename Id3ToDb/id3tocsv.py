@@ -9,6 +9,7 @@ SKIP = "1c73b71e7e1364f2eda6007749a93fe9dc90b844b27a121de985e78b1aa3aa82"
 
 out = open("data.csv", "w", newline="")
 csv_out = csv.writer(out)
+csv_out.writerow(("title", "artist", "album", "songHash", "length"))
 
 chars = "0123456789abcdef"
 
