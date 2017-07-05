@@ -44,7 +44,7 @@ csv_out = csv.writer(out, delimiter=',')
 # csv_infile = open('beispiel.csv', "r")
 # csv_in = csv.reader(csv_infile, delimiter=';')
 
-csv_infile = open('data.csv', "r")
+csv_infile = open('data_less.csv', "r")
 csv_in = csv.reader(csv_infile, delimiter=',')
 
 genrecount = {}
