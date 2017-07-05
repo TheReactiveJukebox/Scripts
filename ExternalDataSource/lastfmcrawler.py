@@ -6,7 +6,7 @@ import time
 # import musicbrainzngs
 import urllib
 import urllib2
-
+import operator
 import musicbrainz_crawl_year_and_genre as mbcyag
 
 
@@ -25,6 +25,14 @@ track = 'Hells+Bells'
 #END EXAMPLES
 
 
+
+def normalizeTag(tagname):
+    tagname=tagname.replace('-', ' ') #rock-pop -> rock pop
+    tagname=tagname.replace('\'', '') #90's -> 90s
+    tagname=tagname.replace('+', ' ') #dance+and+electronica -> dance and electronica
+    tagname=tagname.replace('/', ' ') #singer/songwriter -> singer songwriter
+    return tagname
+
 # read genres
 with open("genres.csv") as f:
     genres = f.readlines()
@@ -36,7 +44,7 @@ csv_out = csv.writer(out, delimiter=',')
 # csv_infile = open('beispiel.csv', "r")
 # csv_in = csv.reader(csv_infile, delimiter=';')
 
-csv_infile = open('data_less.csv', "r")
+csv_infile = open('data.csv', "r")
 csv_in = csv.reader(csv_infile, delimiter=',')
 
 genrecount = {}
@@ -187,10 +195,9 @@ for rownum, row in enumerate(csv_in):
         published=''
         notfound_mb_release+=1
 
-    for g in tags:
-        genrecount[g] = genrecount.get(g, 0) + 1
-
-    # similar titles in extra csv, nicht hier
+    for g in tags: #add tags from current track to genrecount dict
+        gnorm=normalizeTag(g)
+        genrecount[gnorm] = genrecount.get(gnorm, 0) + 1
 
 
     print('%s: %s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s' % (
@@ -202,10 +209,13 @@ for rownum, row in enumerate(csv_in):
                       lfm_albummbid, lfm_playcount, lfm_listeners, lfm_albumcover, str(track_genres)))
 
 #write all tags (one tag only once)
-with open('tags_out.csv', 'w') as csvfile:
-    writer = csv.DictWriter(csvfile, fieldnames=genrecount.keys())
+print genrecount
+genrecount_ordered_list=sorted(genrecount.items(), key=operator.itemgetter(1))
+with open('tags_out.csv', 'w') as genrefile:
+    print genrecount_ordered_list
+    for tag in genrecount_ordered_list:
+        print tag
+        genrefile.write(str(tag[0])+'\n')
 
-    writer.writeheader()
-    writer.writerow(genrecount)
 
-print(genrecount)
+print(genrecount_ordered_list)
