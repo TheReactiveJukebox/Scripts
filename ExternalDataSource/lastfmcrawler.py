@@ -7,6 +7,8 @@ import time
 import urllib
 import urllib2
 
+import musicbrainz_crawl_year_and_genre as mbcyag
+
 
 #EXAMPLES:
 artist = 'AC/DC'
@@ -24,7 +26,7 @@ track = 'Hells+Bells'
 
 
 # read genres
-with open("genres.txt") as f:
+with open("genres.csv") as f:
     genres = f.readlines()
     genres = [x.strip().lower() for x in genres]  # remove whitespaces and linebreakes and make lower case
 
@@ -34,7 +36,7 @@ csv_out = csv.writer(out, delimiter=',')
 # csv_infile = open('beispiel.csv', "r")
 # csv_in = csv.reader(csv_infile, delimiter=';')
 
-csv_infile = open('data.csv', "r")
+csv_infile = open('data_less.csv', "r")
 csv_in = csv.reader(csv_infile, delimiter=',')
 
 genrecount = {}
@@ -166,20 +168,21 @@ for rownum, row in enumerate(csv_in):
     else:
         notfound_lfm_tags += 1
     tags=lfm_tags
-    mb_tags=get_tags(lfm_artist,lfm_album)
+    mb_tags=mbcyag.search_tags(artist,lfm_album)
     if len(mb_tags)>0:
-        for x in :
+        for x in mb_tags:
             tags.append(x) #append musicbrainz tags to lastfm tags
     else:
         notfound_mb_tags +=1
-    # track_genres=[x for x in tags if x in genres] #search for tags with a genre
-    track_genres = tags  # use all tags as genres
+    track_genres=[x for x in tags if x in genres] #search for tags with a genre
+    track_genres=mbcyag.filter_genre_results(track_genres)
+    #track_genres = tags  # use all tags as genres
     # print(result_tags['tags'])
 
 
 
 
-    published = get_release(lfm_artist,lfm_album)
+    published = mbcyag.search_releases(artist,lfm_album) #get oldest release date
     if published==0:
         published=''
         notfound_mb_release+=1
@@ -190,7 +193,7 @@ for rownum, row in enumerate(csv_in):
     # similar titles in extra csv, nicht hier
 
 
-    print('%s: %s,%s,%s,%s,%s,%s,%s,%s,%s,%s' % (
+    print('%s: %s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s' % (
     counter, notfound_lfm_track, notfound_lfm_playcount, notfound_lfm_listeners, notfound_lfm_trackmbid,
     notfound_lfm_artistmbid, notfound_lfm_albummbid, notfound_lfm_album,
     notfound_lfm_albumcover, notfound_lfm_tags, notfound_mb_tags, notfound_mb_release))
