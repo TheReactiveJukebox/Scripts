@@ -7,6 +7,8 @@ import time
 import urllib
 import urllib2
 
+
+#EXAMPLES:
 artist = 'AC/DC'
 track = 'Hells+Bells'
 
@@ -17,6 +19,8 @@ track = 'Hells+Bells'
 # tags to given track
 # result=json.load(urllib2.urlopen("http://ws.audioscrobbler.com/2.0/?#method=track.getTags&api_key=a8b40052edf6a8ce494429b0b3b10f91&artist="+artist+"&track="+track+"&user=RJ&format=json"))
 # print([x['name'].encode('UTF-8') for x in result['tags']['tag'] ])
+
+#END EXAMPLES
 
 
 # read genres
@@ -31,7 +35,6 @@ csv_out = csv.writer(out, delimiter=',')
 # csv_in = csv.reader(csv_infile, delimiter=';')
 
 csv_infile = open('data.csv', "r")
-# csv_infile = io.open("data_less.csv", "r", encoding="utf-8")
 csv_in = csv.reader(csv_infile, delimiter=',')
 
 genrecount = {}
@@ -49,6 +52,8 @@ notfound_lfm_albummbid = 0
 notfound_lfm_album = 0
 notfound_lfm_albumcover = 0
 notfound_lfm_tags = 0
+notfound_mb_tags = 0
+notfound_mb_release = 0
 
 for rownum, row in enumerate(csv_in):
 
@@ -160,40 +165,40 @@ for rownum, row in enumerate(csv_in):
         lfm_tags = [x['name'].encode('UTF-8') for x in result_tags['tags']['tag']]  # list of tags
     else:
         notfound_lfm_tags += 1
-    # lfm_genres=[x for x in lfm_tags if x in genres] #search for tags with a genre
-    lfm_genres = lfm_tags  # use all tags as genres
+    tags=lfm_tags
+    mb_tags=get_tags(artist,album)
+    if len(mb_tags)>0:
+        for x in :
+            tags.append(x) #append musicbrainz tags to lastfm tags
+    else:
+        notfound_mb_tags +=1
+    # track_genres=[x for x in tags if x in genres] #search for tags with a genre
+    track_genres = tags  # use all tags as genres
     # print(result_tags['tags'])
 
-    published = ''  # year published, TODO
 
-    for g in lfm_tags:
+
+
+    published = get_release(lfm_artist,lfm_album)
+    if published==0:
+        published=''
+        notfound_mb_release+=1
+
+    for g in tags:
         genrecount[g] = genrecount.get(g, 0) + 1
 
     # similar titles in extra csv, nicht hier
 
-    # print("album="+lfm_album)
-    # print("albumcover="+lfm_albumcover)
-    # print("tags="+str(lfm_tags))
-    # print("genres="+str(lfm_genres))
 
-    # artist_id = "c5c2ea1c-4bde-4f4d-bd0b-47b200bf99d6"
-    # try:
-    #    result = musicbrainzngs.get_artist_by_id(artist_id)
-    # except WebServiceError as exc:
-    #    print("Something went wrong with the request: %s" % exc)
-    # else:
-    #    artist = result["artist"]
-    #    print("name:\t\t%s" % artist["name"])
-    #    print("sort name:\t%s" % artist["sort-name"])
-
-    print('%s: %s,%s,%s,%s,%s,%s,%s,%s,%s' % (
+    print('%s: %s,%s,%s,%s,%s,%s,%s,%s,%s,%s' % (
     counter, notfound_lfm_track, notfound_lfm_playcount, notfound_lfm_listeners, notfound_lfm_trackmbid,
     notfound_lfm_artistmbid, notfound_lfm_albummbid, notfound_lfm_album,
-    notfound_lfm_albumcover, notfound_lfm_tags))
+    notfound_lfm_albumcover, notfound_lfm_tags, notfound_mb_tags, notfound_mb_release))
 
     csv_out.writerow((title, artist, lfm_album, songHash, length, published, lfm_trackmbid, lfm_artistmbid,
-                      lfm_albummbid, lfm_playcount, lfm_listeners, lfm_albumcover, str(lfm_genres)))
+                      lfm_albummbid, lfm_playcount, lfm_listeners, lfm_albumcover, str(track_genres)))
 
+#write all tags (one tag only once)
 with open('tags_out.csv', 'w') as csvfile:
     writer = csv.DictWriter(csvfile, fieldnames=genrecount.keys())
 
