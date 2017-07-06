@@ -5,7 +5,9 @@ import json
 import time
 # import musicbrainzngs
 import urllib
-import urllib2
+#import urllib2
+from urllib.request import urlopen
+import urllib.parse
 import operator
 import musicbrainz_crawl_year_and_genre as mbcyag
 
@@ -83,12 +85,12 @@ for rownum, row in enumerate(csv_in):
     print(str(rownum) + " t=" + str(round(time.time() - timestart)) + ": " + artist + " - " + title)
 
     apiParams = '&api_key=a8b40052edf6a8ce494429b0b3b10f91&artist=%s&track=%s&user=RJ&format=json' % (
-    urllib.quote(artist), urllib.quote(title))
+    urllib.parse.quote(artist, safe=''), urllib.parse.quote(title, safe=''))
     infoURL = 'http://ws.audioscrobbler.com/2.0/?method=track.getInfo' + apiParams
-    result_info = json.load(urllib2.urlopen(infoURL))
+    result_info = json.load(urllib.request.urlopen(infoURL))
 
     tagURL = 'http://ws.audioscrobbler.com/2.0/?method=track.getTags' + apiParams
-    result_tags = json.load(urllib2.urlopen(tagURL))
+    result_tags = json.load(urllib.request.urlopen(tagURL))
 
     # print([x['name'].encode('UTF-8') for x in result['tags']['tag'] ])
 
@@ -209,12 +211,12 @@ for rownum, row in enumerate(csv_in):
                       lfm_albummbid, lfm_playcount, lfm_listeners, lfm_albumcover, str(track_genres)))
 
 #write all tags (one tag only once)
-print genrecount
+print (genrecount)
 genrecount_ordered_list=sorted(genrecount.items(), key=operator.itemgetter(1))
 with open('tags_out.csv', 'w') as genrefile:
-    print genrecount_ordered_list
+    print (genrecount_ordered_list)
     for tag in genrecount_ordered_list:
-        print tag
+        print (tag)
         genrefile.write(str(tag[0])+'\n')
 
 
