@@ -40,13 +40,13 @@ with open("genres.csv") as f:
     genres = f.readlines()
     genres = [x.strip().lower() for x in genres]  # remove whitespaces and linebreakes and make lower case
 
-out = open("data_out.csv", "w")
+out = open("data_out.csv", "w" )
 csv_out = csv.writer(out, delimiter=',')
 
 # csv_infile = open('beispiel.csv', "r")
 # csv_in = csv.reader(csv_infile, delimiter=';')
 
-csv_infile = open('data_less.csv', "r")
+csv_infile = open('data.csv', "r", encoding="utf-8")
 csv_in = csv.reader(csv_infile, delimiter=',')
 
 genrecount = {}
@@ -178,7 +178,10 @@ for rownum, row in enumerate(csv_in):
     else:
         notfound_lfm_tags += 1
     tags=lfm_tags
-    mb_tags=mbcyag.search_tags(artist,lfm_album)
+
+    mb_result = mbcyag.get_search_result(artist, album, 50) #search for infos about the album by the artist and crawl 50 results
+    
+    mb_tags=mbcyag.search_tags(mb_result,artist)
     if len(mb_tags)>0:
         for x in mb_tags:
             tags.append(x) #append musicbrainz tags to lastfm tags
@@ -189,10 +192,12 @@ for rownum, row in enumerate(csv_in):
     #track_genres = tags  # use all tags as genres
     # print(result_tags['tags'])
 
-
-
-
-    published = mbcyag.search_releases(artist,lfm_album) #get oldest release date
+    #if isinstance(lfm_album, str):
+     #   lfm_album_str = lfm_album
+    #else:
+     #   lfm_album_str = lfm_album.decode('UTF-8')
+    
+    published = mbcyag.search_releases(mb_result,artist,lfm_album) #get oldest release date
     if published==0:
         published=''
         notfound_mb_release+=1
@@ -210,7 +215,7 @@ for rownum, row in enumerate(csv_in):
     csv_out.writerow((title, artist, lfm_album, songHash, length, published, lfm_trackmbid, lfm_artistmbid,
                       lfm_albummbid, lfm_playcount, lfm_listeners, lfm_albumcover, str(track_genres)))
 
-#write all tags (one tag only once)
+# write all tags (one tag only once)
 print (genrecount)
 genrecount_ordered_list=sorted(genrecount.items(), key=operator.itemgetter(1))
 with open('tags_out.csv', 'w') as genrefile:
