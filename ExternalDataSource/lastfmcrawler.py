@@ -6,11 +6,13 @@ import time
 # import musicbrainzngs
 import urllib
 #import urllib2
-from urllib.request import urlopen
+#from urllib.request import urlopen
 import urllib.parse
 import operator
 import musicbrainz_crawl_year_and_genre as mbcyag
+import requests
 
+#TODO Musicbrainz rating
 
 #EXAMPLES:
 artist = 'AC/DC'
@@ -87,10 +89,11 @@ for rownum, row in enumerate(csv_in):
     apiParams = '&api_key=a8b40052edf6a8ce494429b0b3b10f91&artist=%s&track=%s&user=RJ&format=json' % (
     urllib.parse.quote(artist, safe=''), urllib.parse.quote(title, safe=''))
     infoURL = 'http://ws.audioscrobbler.com/2.0/?method=track.getInfo' + apiParams
-    result_info = json.load(urllib.request.urlopen(infoURL))
+    #result_info = json.loads( urllib.request.urlopen(infoURL).read())
+    result_info = json.loads( requests.get(infoURL).text)
 
     tagURL = 'http://ws.audioscrobbler.com/2.0/?method=track.getTags' + apiParams
-    result_tags = json.load(urllib.request.urlopen(tagURL))
+    result_tags = json.loads( requests.get(tagURL).text)
 
     # print([x['name'].encode('UTF-8') for x in result['tags']['tag'] ])
 
