@@ -2,9 +2,7 @@ from __future__ import unicode_literals
 import musicbrainzngs
 import sys
 import time
-#import numpy as np
 import json
-#import urllib2
 import csv
 
 artist='paddy and the rats'
@@ -118,34 +116,25 @@ def show_taglist(result,artistname):
                         genres.append(tag['name'])
     return genres
 
-# search for releases and return the oldest release date (by artist and album)
-#def search_releases(artistname, albumname):
- #   result = musicbrainzngs.search_releases(artist=artistname, release=albumname,
-  #                                          limit=10)
-   # if not result['release-list']:
-    #    sys.exit("no release found")
-    #for (idx, release) in enumerate(result['release-list']):
-     #   show_release_details(release, artistname, albumname)
-    #return show_first_release_date()
-
+# filter the search result for the oldest release date
 def search_releases(result, artistname, albumname):
     if not result['release-list']:
-        sys.exit("no release found")
+        print("no release found")
+        return 
     for (idx, release) in enumerate(result['release-list']):
         show_release_details(release, artistname, albumname)
     return show_first_release_date()
 
-# search for releases and return a list of genres (by artist)
-#def search_tags(artistname, albumname):
- #   result = musicbrainzngs.search_releases(artist=artistname, release=albumname,
-  #                                          limit=50)
-   # return show_taglist(result,artistname)
 
 def search_tags(result, artistname):
     return show_taglist(result,artistname)
 
 def search_rank(result):
     show_tags(result)
+	
+def get_browse_recordings(artist_mbid):
+	result = musicbrainzngs.browse_recordings(artist = artist_mbid, includes=[ratings,tags,user-tags])
+	return result
 
 def get_search_result(artistname, albumname, lim):
     result = musicbrainzngs.search_releases(artist=artistname, release=albumname,

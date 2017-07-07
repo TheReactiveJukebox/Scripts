@@ -50,10 +50,10 @@ def correct_tags(tags):
     tags_correct=[]
     search_for=['electonic']
     replace_with=['electronic']
-    for t in tags:  #TODO
-        for sfindex,sf in enumerate(search_for):
-            if t.equals(search_for[sfindex]):
-                tags_correct+=[t.replace(search_for[sfindex],replace_with[sfindex]]
+    #for t in tags:  #TODO
+        #for sfindex,sf in enumerate(search_for):
+            #if t.equals(search_for[sfindex]):
+                #tags_correct+=[t.replace(search_for[sfindex],replace_with[sfindex]]
 
 # read genres
 with open("genres.csv") as f:
@@ -89,8 +89,8 @@ notfound_mb_release = 0
 notfound_track = 0
 
 for rownum, row in enumerate(csv_in):
-	if rownum > 100:
-		continue
+	#if rownum < 400 or rownum > 420:
+	#	continue
 
 	if (len(row) <= 3):  # line too short
 		continue
@@ -205,7 +205,7 @@ for rownum, row in enumerate(csv_in):
 
 
 	tags=inflate_tags(tags) #inflate tags, example: 'alternative rock' -> 'alternative rock','alternative','rock'
-    tags=correct_tags(tags) #correct typos
+    #tags=correct_tags(tags) #correct typos
 
 	track_genres=[x for x in tags if x in genres] #search for tags with a genre
 	track_genres=mbcyag.filter_genre_results(track_genres) #filter out duplicates
@@ -226,9 +226,12 @@ for rownum, row in enumerate(csv_in):
 	notfound_lfm_artistmbid, notfound_lfm_albummbid, notfound_lfm_album,
 	notfound_lfm_albumcover, notfound_lfm_tags, notfound_mb_tags, notfound_mb_release))
 
-	csv_out.writerow((title, artist, lfm_album, songHash, length, published, lfm_trackmbid, lfm_artistmbid,
+	try:
+		csv_out.writerow((title, artist, lfm_album, songHash, length, published, lfm_trackmbid, lfm_artistmbid,
 					  lfm_albummbid, lfm_playcount, lfm_listeners, lfm_albumcover, str(track_genres)))
-
+	except:
+		print('Can not write in csv_out file')
+					  
 # write all tags (one tag only once)
 print (genrecount)
 genrecount_ordered_list=sorted(genrecount.items(), key=operator.itemgetter(1), reverse=True)
