@@ -37,6 +37,14 @@ def normalizeTag(tagname):
 	tagname=tagname.replace('/', ' ') #singer/songwriter -> singer songwriter
 	return tagname
 
+def inflate_tags(tags):
+    tags_new=[]
+    for t in tags: #'alternative rock'
+        tt=t.split(' ')  #['alternative','rock']
+        tt+=[t] #['alternative', 'rock', 'alternative rock']
+        tags_new+=tt
+    return tags_new
+
 # read genres
 with open("genres.csv") as f:
 	genres = f.readlines()
@@ -71,13 +79,13 @@ notfound_mb_release = 0
 notfound_track = 0
 
 for rownum, row in enumerate(csv_in):
-	if rownum < 200:
+	if rownum > 100:
 		continue
 
 	if (len(row) <= 3):  # line too short
 		continue
 
-	if (rownum == 0):
+	if (rownum == 0): #header
 		csv_out.writerow(('title', 'artist', 'album', 'songHash', 'length', 'published', 'trackmbid', 'artistmbid',
 						  'albummbid', 'playcount', 'listeners', 'albumcover', 'genres'))
 		continue  # next row
@@ -92,17 +100,17 @@ for rownum, row in enumerate(csv_in):
 	apiParams = '&api_key=a8b40052edf6a8ce494429b0b3b10f91&artist=%s&track=%s&user=RJ&format=json' % (
 	urllib.parse.quote(artist, safe=''), urllib.parse.quote(title, safe=''))
 	infoURL = 'http://ws.audioscrobbler.com/2.0/?method=track.getInfo' + apiParams
-	#result_info = json.loads( urllib.request.urlopen(infoURL).read())
+	#result_info = json.loads( urllib.request.urlopen(infoURL).read()) #used before
 	result_info = json.loads( requests.get(infoURL).text)
 
 	tagURL = 'http://ws.audioscrobbler.com/2.0/?method=track.getTags' + apiParams
 	result_tags = json.loads( requests.get(tagURL).text)
 
-	# print([x['name'].encode('UTF-8') for x in result['tags']['tag'] ])
 
 
 	counter += 1
 
+    #initialize
 	lfm_track = ''
 	lfm_album = ''
 	lfm_playcount = '0'
@@ -112,7 +120,7 @@ for rownum, row in enumerate(csv_in):
 	lfm_albummbid = ''
 	lfm_albumcover = ''
 	lfm_tags = []
-	
+
 	if 'track' not in result_info:
 		notfound_track += 1
 	else:
@@ -162,23 +170,14 @@ for rownum, row in enumerate(csv_in):
 
 		if 'album' in result_info['track']:
 			if 'image' in result_info['track']['album']:
-				lfm_albumcover = result_info['track']['album']['image'][-1]['#text'].encode('UTF-8')
+				lfm_albumcover = result_info['track']['album']['image'][-1]['#text'].encode('UTF-8')  #-1=biggest,  -2=2nd biggest, and so on
 			else:
 				notfound_lfm_albumcover += 1
 		else:
 			notfound_lfm_albumcover += 1
 
-		# old without check if available:
-		# lfm_track=result_info['track']['name'].encode('UTF-8')
-		# lfm_playcount=result_info['track']['playcount'].encode('UTF-8')
-		# lfm_listeners=result_info['track']['listeners'].encode('UTF-8')
-		# lfm_trackmbid=result_info['track']['mbid'].encode('UTF-8')
-		# lfm_artistmbid=result_info['track']['artist']['mbid'].encode('UTF-8')
-		# lfm_albummbid=result_info['track']['album']['mbid'].encode('UTF-8')
-		# lfm_album=result_info['track']['album']['title'].encode('UTF-8')
-		# lfm_albumcover=result_info['track']['album']['image'][-1]['#text'].encode('UTF-8')  #-1=biggest,  -2=2nd biggest, and so on
 
-		
+
 		if 'tag' in result_tags['tags']:
 			lfm_tags = [x['name'].encode('UTF-8') for x in result_tags['tags']['tag']]  # list of tags
 		else:
@@ -186,23 +185,21 @@ for rownum, row in enumerate(csv_in):
 	tags=lfm_tags
 
 	mb_result = mbcyag.get_search_result(artist, album, 50) #search for infos about the album by the artist and crawl 50 results
-	
-	mb_tags=mbcyag.search_tags(mb_result,artist)
+
+	mb_tags=mbcyag.search_tags(mb_result,artist) #get tags from MusicBrianz
 	if len(mb_tags)>0:
 		for x in mb_tags:
 			tags.append(x) #append musicbrainz tags to lastfm tags
 	else:
 		notfound_mb_tags +=1
-	track_genres=[x for x in tags if x in genres] #search for tags with a genre
-	track_genres=mbcyag.filter_genre_results(track_genres)
-	#track_genres = tags  # use all tags as genres
-	# print(result_tags['tags'])
 
-	#if isinstance(lfm_album, str):
-	 #   lfm_album_str = lfm_album
-	#else:
-	 #   lfm_album_str = lfm_album.decode('UTF-8')
-	
+
+	tags=inflate_tags(tags) #inflate tags, example: 'alternative rock' -> 'alternative rock','alternative','rock'
+
+	track_genres=[x for x in tags if x in genres] #search for tags with a genre
+	track_genres=mbcyag.filter_genre_results(track_genres) #filter out duplicates
+	#track_genres = tags  #For Testing, use all tags as genres
+
 	published = mbcyag.search_releases(mb_result,artist,lfm_album) #get oldest release date
 	if published==0:
 		published=''
@@ -223,7 +220,7 @@ for rownum, row in enumerate(csv_in):
 
 # write all tags (one tag only once)
 print (genrecount)
-genrecount_ordered_list=sorted(genrecount.items(), key=operator.itemgetter(1))
+genrecount_ordered_list=sorted(genrecount.items(), key=operator.itemgetter(1), reverse=True)
 with open('tags_out.csv', 'w') as genrefile:
 	print (genrecount_ordered_list)
 	for tag in genrecount_ordered_list:
