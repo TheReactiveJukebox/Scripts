@@ -38,22 +38,24 @@ def normalizeTag(tagname):
 	return tagname
 
 def inflate_tags(tags):
-    tags_new=[]
-    for t in tags: #'alternative rock'
-        tt=t.split(' ')  #['alternative','rock']
-        tt+=[t] #['alternative', 'rock', 'alternative rock']
-        tags_new+=tt
-    return tags_new
+	tags_new=[]
+	for t in tags: #'alternative rock'
+		if type(t) is not str: #some tags can be of type 'byte' (for example Oasis - Wonderwall)
+			t=t.decode('UTF-8') #decode byte to string
+		tt=t.split(' ')  #['alternative','rock']
+		tt+=[t] #['alternative', 'rock', 'alternative rock']
+		tags_new+=tt
+	return tags_new
 
-def correct_tags(tags):
-    return tags
-    tags_correct=[]
-    search_for=['electonic']
-    replace_with=['electronic']
-    #for t in tags:  #TODO
-        #for sfindex,sf in enumerate(search_for):
-            #if t.equals(search_for[sfindex]):
-                #tags_correct+=[t.replace(search_for[sfindex],replace_with[sfindex]]
+def correct_tags(tags): #correct common spelling mistakes
+	tags_correct=[]
+	search_for=['electonic','r&b','electro swing','synth pop','ragga','synthie pop','genre: deep house']
+	replace_with=['electronic','rnb','electroswing','synthpop','reggae','synthpop','deep house']
+	for t in tags:
+		for sfindex,sf in enumerate(search_for):
+			t=t.replace(search_for[sfindex],replace_with[sfindex])
+		tags_correct+=[t]
+	return tags_correct
 
 # read genres
 with open("genres.csv") as f:
@@ -88,8 +90,9 @@ notfound_mb_tags = 0
 notfound_mb_release = 0
 notfound_track = 0
 
+
 for rownum, row in enumerate(csv_in):
-	#if rownum < 400 or rownum > 420:
+	#if rownum < 543 or rownum > 550:
 	#	continue
 
 	if (len(row) <= 3):  # line too short
@@ -203,9 +206,9 @@ for rownum, row in enumerate(csv_in):
 	else:
 		notfound_mb_tags +=1
 
-
-	tags=inflate_tags(tags) #inflate tags, example: 'alternative rock' -> 'alternative rock','alternative','rock'
-    #tags=correct_tags(tags) #correct typos
+	tags=inflate_tags(tags) #inflate tags (also fix utf8 tags), example: 'alternative rock' -> 'alternative rock','alternative','rock'
+	tags=[normalizeTag(t) for t in tags] #normalize tags. for example replace '-' by ' '
+	tags=correct_tags(tags) #correct typos
 
 	track_genres=[x for x in tags if x in genres] #search for tags with a genre
 	track_genres=mbcyag.filter_genre_results(track_genres) #filter out duplicates
@@ -217,8 +220,7 @@ for rownum, row in enumerate(csv_in):
 		notfound_mb_release+=1
 
 	for g in tags: #add tags from current track to genrecount dict
-		gnorm=normalizeTag(g)
-		genrecount[gnorm] = genrecount.get(gnorm, 0) + 1
+		genrecount[g] = genrecount.get(g, 0) + 1
 
 
 	print('%s: %s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s' % (
@@ -231,15 +233,18 @@ for rownum, row in enumerate(csv_in):
 					  lfm_albummbid, lfm_playcount, lfm_listeners, lfm_albumcover, str(track_genres)))
 	except:
 		print('Can not write in csv_out file')
-					  
+
 # write all tags (one tag only once)
-print (genrecount)
 genrecount_ordered_list=sorted(genrecount.items(), key=operator.itemgetter(1), reverse=True)
 with open('tags_out.csv', 'w') as genrefile:
 	print (genrecount_ordered_list)
 	for tag in genrecount_ordered_list:
-		print (tag)
 		genrefile.write(str(tag[0])+'\n')
 
 
 print(genrecount_ordered_list)
+print('stats')
+print('%s: %s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s' % (
+counter, notfound_track, notfound_lfm_track, notfound_lfm_playcount, notfound_lfm_listeners, notfound_lfm_trackmbid,
+notfound_lfm_artistmbid, notfound_lfm_albummbid, notfound_lfm_album,
+notfound_lfm_albumcover, notfound_lfm_tags, notfound_mb_tags, notfound_mb_release))
