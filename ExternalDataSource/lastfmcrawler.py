@@ -45,6 +45,16 @@ def inflate_tags(tags):
         tags_new+=tt
     return tags_new
 
+def correct_tags(tags):
+    return tags
+    tags_correct=[]
+    search_for=['electonic']
+    replace_with=['electronic']
+    for t in tags:  #TODO
+        for sfindex,sf in enumerate(search_for):
+            if t.equals(search_for[sfindex]):
+                tags_correct+=[t.replace(search_for[sfindex],replace_with[sfindex]]
+
 # read genres
 with open("genres.csv") as f:
 	genres = f.readlines()
@@ -195,6 +205,7 @@ for rownum, row in enumerate(csv_in):
 
 
 	tags=inflate_tags(tags) #inflate tags, example: 'alternative rock' -> 'alternative rock','alternative','rock'
+    tags=correct_tags(tags) #correct typos
 
 	track_genres=[x for x in tags if x in genres] #search for tags with a genre
 	track_genres=mbcyag.filter_genre_results(track_genres) #filter out duplicates
