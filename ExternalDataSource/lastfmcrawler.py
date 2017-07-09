@@ -62,8 +62,8 @@ with open("genres.csv") as f:
 	genres = f.readlines()
 	genres = [x.strip().lower() for x in genres]  # remove whitespaces and linebreakes and make lower case
 
-out = open("data_out.csv", "w" )
-csv_out = csv.writer(out, delimiter=',')
+out = open("data_out_test.csv", "w" )
+csv_out = csv.writer(out, delimiter=',') # TODO: encoding utf-8
 
 # csv_infile = open('beispiel.csv', "r")
 # csv_in = csv.reader(csv_infile, delimiter=';')
@@ -92,8 +92,8 @@ notfound_track = 0
 
 
 for rownum, row in enumerate(csv_in):
-	#if rownum < 543 or rownum > 550:
-	#	continue
+	if rownum > 50:
+		break
 
 	if (len(row) <= 3):  # line too short
 		continue
@@ -123,7 +123,7 @@ for rownum, row in enumerate(csv_in):
 
 	counter += 1
 
-    #initialize
+	#initialize
 	lfm_track = ''
 	lfm_album = ''
 	lfm_playcount = '0'
@@ -189,13 +189,16 @@ for rownum, row in enumerate(csv_in):
 		else:
 			notfound_lfm_albumcover += 1
 
-
-
 		if 'tag' in result_tags['tags']:
 			lfm_tags = [x['name'].encode('UTF-8') for x in result_tags['tags']['tag']]  # list of tags
 		else:
 			notfound_lfm_tags += 1
 	tags=lfm_tags
+
+	if lfm_artistmbid != '':
+		mb_another_result = mbcyag.get_mb_result(lfm_artistmbid.decode('UTF-8'))
+		print(mbcyag.get_rank(mb_another_result))
+		print(mbcyag.get_tags(mb_another_result))
 
 	mb_result = mbcyag.get_search_result(artist, album, 50) #search for infos about the album by the artist and crawl 50 results
 

@@ -4,9 +4,16 @@ import sys
 import time
 import json
 import csv
+import urllib
+import requests
 
+
+
+artist_mbid = "ee224919-a673-473d-8368-777795c73fbf"
+#artist_mbid = "ed4aa69e-e049-4ac4-90c3-869aee5decac"
 artist='paddy and the rats'
 album='hymns for bastards'
+dict = {'artist':artist_mbid}
 #artist ='ac/dc'
 #album='Back in Black'
 #artist = 'sean paul'
@@ -25,6 +32,8 @@ musicbrainzngs.set_useragent(
     "0.1",
     "https://github.com/alastair/python-musicbrainzngs/",
 )
+
+musicbrainzngs.auth("reactivejukebox", "_hierspieltdiemusik4")
 
 def iterate_over_file(csv_in):
     count = 0
@@ -80,11 +89,8 @@ def compare_name(first, second):
 
 # filter the search result for the release dates
 def show_release_details(rel, artistname, albumname):
-    #print ('show_release_details', type(artistname), ' ', type (albumname))
     data_artist = rel['artist-credit-phrase']
     data_album = rel['title']
-    #csv_artist = artistname.decode('UTF-8')
-    #csv_album = albumname.decode('UTF-8')
     if compare_name(data_artist, artistname) and compare_name(data_album, albumname):
         if 'date' in rel:
             datelist.append(rel['date'])
@@ -108,7 +114,7 @@ def show_taglist(result,artistname):
         return [] #no list was found
     for (idx, release) in enumerate(result['release-list']):
         if not 'artist-credit-phrase' in release:
-            print("No artist credit name given");
+            print("No artist credit name given")
         else:
             if (release['artist-credit-phrase'].lower() == artistname.lower()):
                 if 'tag-list' in release:
@@ -129,12 +135,25 @@ def search_releases(result, artistname, albumname):
 def search_tags(result, artistname):
     return show_taglist(result,artistname)
 
-def search_rank(result):
-    show_tags(result)
-	
-def get_browse_recordings(artist_mbid):
-	result = musicbrainzngs.browse_recordings(artist = artist_mbid, includes=[ratings,tags,user-tags])
-	return result
+def get_rank(result):
+    if not 'rating' in result:
+            print("No rating given")
+    else:
+        rating_votes_count =  result['rating']['votes-count']
+        rating_value = result['rating']['value']
+        return [rating_votes_count, rating_value]
+
+def get_mb_result(artist_mbid):
+    return json.loads(requests.get("http://musicbrainz.org/ws/2/artist/"+artist_mbid+"?inc=aliases+tags+ratings&fmt=json").text)
+
+def get_tags(result):
+    genres = []
+    if not 'tags' in result:
+            print("No tags given")
+    else:
+        for tag in result['tags']:
+            genres.append(tag['name'])
+    return genres
 
 def get_search_result(artistname, albumname, lim):
     result = musicbrainzngs.search_releases(artist=artistname, release=albumname,
@@ -144,8 +163,33 @@ def get_search_result(artistname, albumname, lim):
 # delete doubles
 def filter_genre_results(taglist):
     return sorted(set(taglist), key=taglist.index)
+	
+def test():
+    #artist_id = "c5c2ea1c-4bde-4f4d-bd0b-47b200bf99d6"
+    try:
+        #result = musicbrainzngs.get_artist_by_id(artist_mbid, includes=['ratings'])
+        result = musicbrainzngs.get_label_by_id(label_id, includes=['ratings'])
+    except:
+        print("Something went wrong with the request!")
+    else:
+        #artist = result["artist"]
+        #print("name:\t\t%s" % artist["name"])
+        #print("sort name:\t%s" % artist["sort-name"])
+        show_tags(result)
+
+def testrequest():
+    result = json.loads(requests.get("http://musicbrainz.org/ws/2/artist/"+artist_mbid+"?inc=aliases+tags+ratings&fmt=json").text)
+    show_tags(result)
 
 #csv_in = read_csv_file()
 #iterate_over_file(csv_in)
-#result = get_search_result(artist, album, 10)
+#result = get_artist_by_id()
 #search_rank(result)
+
+#label_id = "9e0bc8d8-cb67-4a55-8ad5-603cf4fd20a8"
+#result = get_search_result(artist,album,1)
+#show_tags(result)
+#id = "05cbaf37-6dc2-4f71-a0ce-d633447d90c3"
+#result = get_mb_result(artist_mbid)
+#print(get_rank(result))
+#print(get_tags(result))
