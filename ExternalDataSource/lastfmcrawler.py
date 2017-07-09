@@ -12,8 +12,6 @@ import operator
 import musicbrainz_crawl_year_and_genre as mbcyag
 import requests
 
-#TODO Musicbrainz rating
-
 #EXAMPLES:
 artist = 'AC/DC'
 track = 'Hells+Bells'
@@ -51,8 +49,8 @@ def inflate_tags(tags):
 
 def correct_tags(tags): #correct common spelling mistakes
 	tags_correct=[]
-	search_for=['electonic','r&b','electro swing','synth pop','ragga','synthie pop','genre: deep house','rhythm and blues','hellektro','pbrnb']
-	replace_with=['electronic','rnb','electroswing','synthpop','reggae','synthpop','deep house','rhythm & blues','aggrotech','alternative rnb']
+	search_for=['electonic','r&b','electro swing','synth pop','ragga','synthie pop','genre: deep house','rhythm and blues','hellektro','pbrnb','1960s','1970s','1980s','1990s','hiphop']
+	replace_with=['electronic','rnb','electroswing','synthpop','reggae','synthpop','deep house','rhythm & blues','aggrotech','alternative rnb','60s','70s','80s','90s','hip hop']
 	for t in tags:
 		for sfindex,sf in enumerate(search_for):
 			t=t.replace(search_for[sfindex],replace_with[sfindex])
