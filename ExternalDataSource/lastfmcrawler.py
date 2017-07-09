@@ -204,7 +204,7 @@ for rownum, row in enumerate(csv_in):
 		#print(mbcyag.get_rank(mb_another_result))
 		#print(mbcyag.get_tags(mb_another_result))
 		mb_another_tags=mbcyag.get_tags(mb_another_result)
-		mb_rating=str(mbcyag.get_rank(mb_another_result)[1])
+		mb_rating=mbcyag.get_rank(mb_another_result)[1]
 		if mb_rating is None:
 			mb_rating=''
 			notfound_mb_rank+=1
