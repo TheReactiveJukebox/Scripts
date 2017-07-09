@@ -78,7 +78,7 @@ def compare_name(first, second):
         s = second.lower()
     else:
         s = second.decode('UTF-8').lower()
-    
+
     f_in_s = s.find(f)
     s_in_f = f.find(s)
 
@@ -126,7 +126,7 @@ def show_taglist(result,artistname):
 def search_releases(result, artistname, albumname):
     if not result['release-list']:
         print("no release found")
-        return 
+        return
     for (idx, release) in enumerate(result['release-list']):
         show_release_details(release, artistname, albumname)
     return show_first_release_date()
@@ -137,7 +137,8 @@ def search_tags(result, artistname):
 
 def get_rank(result):
     if not 'rating' in result:
-            print("No rating given")
+            #print("No rating given")
+            return [None,None]
     else:
         rating_votes_count =  result['rating']['votes-count']
         rating_value = result['rating']['value']
@@ -149,7 +150,8 @@ def get_mb_result(artist_mbid):
 def get_tags(result):
     genres = []
     if not 'tags' in result:
-            print("No tags given")
+            #print("No tags given")
+            return genres #return empty list
     else:
         for tag in result['tags']:
             genres.append(tag['name'])
@@ -163,7 +165,7 @@ def get_search_result(artistname, albumname, lim):
 # delete doubles
 def filter_genre_results(taglist):
     return sorted(set(taglist), key=taglist.index)
-	
+
 def test():
     #artist_id = "c5c2ea1c-4bde-4f4d-bd0b-47b200bf99d6"
     try:

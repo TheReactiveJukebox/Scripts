@@ -35,6 +35,8 @@ def normalizeTag(tagname):
 	tagname=tagname.replace('\'', '') #90's -> 90s
 	tagname=tagname.replace('+', ' ') #dance+and+electronica -> dance and electronica
 	tagname=tagname.replace('/', ' ') #singer/songwriter -> singer songwriter
+	tagname=tagname.replace('.', ' ') #post.rock -> post rock
+	tagname=tagname.replace('_', ' ')  #alternative_metal -> alternative metal
 	return tagname
 
 def inflate_tags(tags):
@@ -49,8 +51,8 @@ def inflate_tags(tags):
 
 def correct_tags(tags): #correct common spelling mistakes
 	tags_correct=[]
-	search_for=['electonic','r&b','electro swing','synth pop','ragga','synthie pop','genre: deep house']
-	replace_with=['electronic','rnb','electroswing','synthpop','reggae','synthpop','deep house']
+	search_for=['electonic','r&b','electro swing','synth pop','ragga','synthie pop','genre: deep house','rhythm and blues','hellektro','pbrnb']
+	replace_with=['electronic','rnb','electroswing','synthpop','reggae','synthpop','deep house','rhythm & blues','aggrotech','alternative rnb']
 	for t in tags:
 		for sfindex,sf in enumerate(search_for):
 			t=t.replace(search_for[sfindex],replace_with[sfindex])
@@ -89,18 +91,19 @@ notfound_lfm_tags = 0
 notfound_mb_tags = 0
 notfound_mb_release = 0
 notfound_track = 0
+notfound_mb_rank = 0
 
 
 for rownum, row in enumerate(csv_in):
-	if rownum > 50:
-		break
+	#if rownum > 50:
+		#break
 
 	if (len(row) <= 3):  # line too short
 		continue
 
 	if (rownum == 0): #header
 		csv_out.writerow(('title', 'artist', 'album', 'songHash', 'length', 'published', 'trackmbid', 'artistmbid',
-						  'albummbid', 'playcount', 'listeners', 'albumcover', 'genres'))
+						  'albummbid', 'playcount', 'listeners', 'albumcover', 'genres', 'rating'))
 		continue  # next row
 
 	title = row[0]
@@ -133,6 +136,7 @@ for rownum, row in enumerate(csv_in):
 	lfm_albummbid = ''
 	lfm_albumcover = ''
 	lfm_tags = []
+	mb_rating=''
 
 	if 'track' not in result_info:
 		notfound_track += 1
@@ -196,10 +200,18 @@ for rownum, row in enumerate(csv_in):
 			notfound_lfm_tags += 1
 	tags=lfm_tags
 
+	mb_another_tags=[]
 	if lfm_artistmbid != '':
 		mb_another_result = mbcyag.get_mb_result(lfm_artistmbid)
-		print(mbcyag.get_rank(mb_another_result))
-		print(mbcyag.get_tags(mb_another_result))
+		#print(mbcyag.get_rank(mb_another_result))
+		#print(mbcyag.get_tags(mb_another_result))
+		mb_another_tags=mbcyag.get_tags(mb_another_result)
+		mb_rating=str(mbcyag.get_rank(mb_another_result)[1])
+		if mb_rating is None:
+			mb_rating=''
+			notfound_mb_rank+=1
+	else:
+		notfound_mb_rank+=1
 
 	mb_result = mbcyag.get_search_result(artist, album, 50) #search for infos about the album by the artist and crawl 50 results
 
@@ -209,6 +221,10 @@ for rownum, row in enumerate(csv_in):
 			tags.append(x) #append musicbrainz tags to lastfm tags
 	else:
 		notfound_mb_tags +=1
+
+	if len(mb_another_tags)>0:  #Add more musicbrainz tags
+		for x in mb_another_tags:
+			tags.append(x) #append musicbrainz tags to lastfm tags
 
 	tags=inflate_tags(tags) #inflate tags (also fix utf8 tags), example: 'alternative rock' -> 'alternative rock','alternative','rock'
 	tags=[normalizeTag(t) for t in tags] #normalize tags. for example replace '-' by ' '
@@ -227,14 +243,14 @@ for rownum, row in enumerate(csv_in):
 		genrecount[g] = genrecount.get(g, 0) + 1
 
 
-	print('%s: %s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s' % (
+	print('%s: %s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s' % (
 	counter, notfound_track, notfound_lfm_track, notfound_lfm_playcount, notfound_lfm_listeners, notfound_lfm_trackmbid,
 	notfound_lfm_artistmbid, notfound_lfm_albummbid, notfound_lfm_album,
-	notfound_lfm_albumcover, notfound_lfm_tags, notfound_mb_tags, notfound_mb_release))
+	notfound_lfm_albumcover, notfound_lfm_tags, notfound_mb_tags, notfound_mb_release,notfound_mb_rank))
 
 	try:
 		csv_out.writerow((title, artist, lfm_album, songHash, length, published, lfm_trackmbid, lfm_artistmbid,
-					  lfm_albummbid, lfm_playcount, lfm_listeners, lfm_albumcover, str(track_genres)))
+					  lfm_albummbid, lfm_playcount, lfm_listeners, lfm_albumcover, str(track_genres),mb_rating))
 	except:
 		print('Can not write in csv_out file')
 
@@ -248,7 +264,7 @@ with open('tags_out.csv', 'w') as genrefile:
 
 print(genrecount_ordered_list)
 print('stats')
-print('%s: %s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s' % (
+print('%s: %s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s' % (
 counter, notfound_track, notfound_lfm_track, notfound_lfm_playcount, notfound_lfm_listeners, notfound_lfm_trackmbid,
 notfound_lfm_artistmbid, notfound_lfm_albummbid, notfound_lfm_album,
-notfound_lfm_albumcover, notfound_lfm_tags, notfound_mb_tags, notfound_mb_release))
+notfound_lfm_albumcover, notfound_lfm_tags, notfound_mb_tags, notfound_mb_release,notfound_mb_rank))
