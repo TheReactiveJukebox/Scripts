@@ -138,28 +138,28 @@ for rownum, row in enumerate(csv_in):
 		notfound_track += 1
 	else:
 		if 'name' in result_info['track']:
-			lfm_track = result_info['track']['name'].encode('UTF-8')
+			lfm_track = result_info['track']['name'] #.encode('UTF-8')
 		else:
 			notfound_lfm_track += 1
 
 		if 'playcount' in result_info['track']:
-			lfm_playcount = result_info['track']['playcount'].encode('UTF-8')
+			lfm_playcount = result_info['track']['playcount'] #.encode('UTF-8')
 		else:
 			notfound_lfm_playcount += 1
 
 		if 'listeners' in result_info['track']:
-			lfm_listeners = result_info['track']['listeners'].encode('UTF-8')
+			lfm_listeners = result_info['track']['listeners'] #.encode('UTF-8')
 		else:
 			notfound_lfm_listeners += 1
 
 		if 'mbid' in result_info['track']:
-			lfm_trackmbid = result_info['track']['mbid'].encode('UTF-8')
+			lfm_trackmbid = result_info['track']['mbid'] #.encode('UTF-8')
 		else:
 			notfound_lfm_trackmbid += 1
 
 		if 'artist' in result_info['track']:
 			if 'mbid' in result_info['track']['artist']:
-				lfm_artistmbid = result_info['track']['artist']['mbid'].encode('UTF-8')
+				lfm_artistmbid = result_info['track']['artist']['mbid'] #.encode('UTF-8')
 			else:
 				notfound_lfm_artistmbid += 1
 		else:
@@ -167,7 +167,7 @@ for rownum, row in enumerate(csv_in):
 
 		if 'album' in result_info['track']:
 			if 'mbid' in result_info['track']['album']:
-				lfm_albummbid = result_info['track']['album']['mbid'].encode('UTF-8')
+				lfm_albummbid = result_info['track']['album']['mbid'] #.encode('UTF-8')
 			else:
 				notfound_lfm_albummbid += 1
 		else:
@@ -175,7 +175,7 @@ for rownum, row in enumerate(csv_in):
 
 		if 'album' in result_info['track']:
 			if 'title' in result_info['track']['album']:
-				lfm_album = result_info['track']['album']['title'].encode('UTF-8')
+				lfm_album = result_info['track']['album']['title'] #.encode('UTF-8')
 			else:
 				notfound_lfm_album += 1
 		else:
@@ -183,20 +183,21 @@ for rownum, row in enumerate(csv_in):
 
 		if 'album' in result_info['track']:
 			if 'image' in result_info['track']['album']:
-				lfm_albumcover = result_info['track']['album']['image'][-1]['#text'].encode('UTF-8')  #-1=biggest,  -2=2nd biggest, and so on
+				lfm_albumcover = result_info['track']['album']['image'][-1]['#text'] #.encode('UTF-8')  #-1=biggest,  -2=2nd biggest, and so on
 			else:
 				notfound_lfm_albumcover += 1
 		else:
 			notfound_lfm_albumcover += 1
 
 		if 'tag' in result_tags['tags']:
-			lfm_tags = [x['name'].encode('UTF-8') for x in result_tags['tags']['tag']]  # list of tags
+			#lfm_tags = [x['name'].encode('UTF-8') for x in result_tags['tags']['tag']]  # list of tags
+			lfm_tags = [x['name'] for x in result_tags['tags']['tag']]  # list of tags
 		else:
 			notfound_lfm_tags += 1
 	tags=lfm_tags
 
 	if lfm_artistmbid != '':
-		mb_another_result = mbcyag.get_mb_result(lfm_artistmbid.decode('UTF-8'))
+		mb_another_result = mbcyag.get_mb_result(lfm_artistmbid)
 		print(mbcyag.get_rank(mb_another_result))
 		print(mbcyag.get_tags(mb_another_result))
 
