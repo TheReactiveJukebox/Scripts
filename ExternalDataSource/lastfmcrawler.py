@@ -63,7 +63,7 @@ with open("genres.csv") as f:
 	genres = [x.strip().lower() for x in genres]  # remove whitespaces and linebreakes and make lower case
 
 out = open("data_out_test.csv", "w" )
-csv_out = csv.writer(out, delimiter=',') # TODO: encoding utf-8
+csv_out = csv.writer(out, delimiter=',')
 
 # csv_infile = open('beispiel.csv', "r")
 # csv_in = csv.reader(csv_infile, delimiter=';')
@@ -90,18 +90,19 @@ notfound_mb_tags = 0
 notfound_mb_release = 0
 notfound_track = 0
 notfound_mb_rank = 0
+notfound_mb_track_rank = 0
 
 
 for rownum, row in enumerate(csv_in):
-	#if rownum > 50:
-		#break
+	if rownum > 50:
+		break
 
 	if (len(row) <= 3):  # line too short
 		continue
 
 	if (rownum == 0): #header
 		csv_out.writerow(('title', 'artist', 'album', 'songHash', 'length', 'published', 'trackmbid', 'artistmbid',
-						  'albummbid', 'playcount', 'listeners', 'albumcover', 'genres', 'rating'))
+						  'albummbid', 'playcount', 'listeners', 'albumcover', 'genres', 'rating', 'trackRating'))
 		continue  # next row
 
 	title = row[0]
@@ -134,7 +135,8 @@ for rownum, row in enumerate(csv_in):
 	lfm_albummbid = ''
 	lfm_albumcover = ''
 	lfm_tags = []
-	mb_rating=''
+	mb_another_tags = []
+	mb_rating = ''
 
 	if 'track' not in result_info:
 		notfound_track += 1
@@ -198,22 +200,28 @@ for rownum, row in enumerate(csv_in):
 			notfound_lfm_tags += 1
 	tags=lfm_tags
 
-	mb_another_tags=[]
+	
 	if lfm_artistmbid != '':
-		mb_another_result = mbcyag.get_mb_result(lfm_artistmbid)
-		#print(mbcyag.get_rank(mb_another_result))
-		#print(mbcyag.get_tags(mb_another_result))
-		mb_another_tags=mbcyag.get_tags(mb_another_result)
-		mb_rating=mbcyag.get_rank(mb_another_result)[1]
+		mb_another_result = mbcyag.get_mb_result(lfm_artistmbid) #search for infos about ratings and tags by the artist-id
+		mb_another_tags = mbcyag.get_tags(mb_another_result) # get tags from MusicBrianz by artist (and not by recording!!!)
+		mb_rating = mbcyag.get_rank(mb_another_result)[1] # get rating value
 		if mb_rating is None:
-			mb_rating=''
-			notfound_mb_rank+=1
+			mb_rating = ''
+			notfound_mb_rank += 1
 	else:
-		notfound_mb_rank+=1
+		notfound_mb_rank += 1
+		
+		
+	if lfm_trackmbid != '':
+		mb_recording_result = mbcyag.get_recording_result(lfm_trackmbid) # search for infos about ratings by the recording-id (track-id)
+		mb_track_rating = mbcyag.get_rank(mb_recording_result)[1] # get track rating value
+		if mb_track_rating is None:
+			mb_track_rating = ''
+			notfound_mb_track_rank += 1
 
 	mb_result = mbcyag.get_search_result(artist, album, 50) #search for infos about the album by the artist and crawl 50 results
 
-	mb_tags=mbcyag.search_tags(mb_result,artist) #get tags from MusicBrianz
+	mb_tags=mbcyag.search_tags(mb_result,artist) #get tags from MusicBrianz by artist (and not by recording!!!)
 	if len(mb_tags)>0:
 		for x in mb_tags:
 			tags.append(x) #append musicbrainz tags to lastfm tags
@@ -248,7 +256,7 @@ for rownum, row in enumerate(csv_in):
 
 	try:
 		csv_out.writerow((title, artist, lfm_album, songHash, length, published, lfm_trackmbid, lfm_artistmbid,
-					  lfm_albummbid, lfm_playcount, lfm_listeners, lfm_albumcover, str(track_genres),mb_rating))
+					  lfm_albummbid, lfm_playcount, lfm_listeners, lfm_albumcover, str(track_genres), mb_rating, mb_track_rating))
 	except:
 		print('Can not write in csv_out file')
 
@@ -262,7 +270,7 @@ with open('tags_out.csv', 'w') as genrefile:
 
 print(genrecount_ordered_list)
 print('stats')
-print('%s: %s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s' % (
+print('%s: %s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s' % (
 counter, notfound_track, notfound_lfm_track, notfound_lfm_playcount, notfound_lfm_listeners, notfound_lfm_trackmbid,
 notfound_lfm_artistmbid, notfound_lfm_albummbid, notfound_lfm_album,
-notfound_lfm_albumcover, notfound_lfm_tags, notfound_mb_tags, notfound_mb_release,notfound_mb_rank))
+notfound_lfm_albumcover, notfound_lfm_tags, notfound_mb_tags, notfound_mb_release,notfound_mb_rank,notfound_mb_track_rank))

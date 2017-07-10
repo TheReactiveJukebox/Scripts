@@ -13,6 +13,8 @@ artist_mbid = "ee224919-a673-473d-8368-777795c73fbf"
 #artist_mbid = "ed4aa69e-e049-4ac4-90c3-869aee5decac"
 artist='paddy and the rats'
 album='hymns for bastards'
+album_mbid = "9fd0681a-7f48-49b5-8855-b624e559d061" # release-id
+recording_mbid = "83a23515-5db5-45f9-8ec8-9be9f4003d00"
 dict = {'artist':artist_mbid}
 #artist ='ac/dc'
 #album='Back in Black'
@@ -107,20 +109,6 @@ def show_first_release_date():
 def show_tags(rel):
     print(json.dumps(rel, indent=4))
 
-# filter the search result for tags
-def show_taglist(result,artistname):
-    genres = []
-    if not result['release-list']:
-        return [] #no list was found
-    for (idx, release) in enumerate(result['release-list']):
-        if not 'artist-credit-phrase' in release:
-            print("No artist credit name given")
-        else:
-            if (release['artist-credit-phrase'].lower() == artistname.lower()):
-                if 'tag-list' in release:
-                    for tag in release['tag-list']:
-                        genres.append(tag['name'])
-    return genres
 
 # filter the search result for the oldest release date
 def search_releases(result, artistname, albumname):
@@ -131,10 +119,26 @@ def search_releases(result, artistname, albumname):
         show_release_details(release, artistname, albumname)
     return show_first_release_date()
 
+# filter the search result for tags by artist (and not by recording/album!!!)
+def search_tags(result, artistname): # , albumname):
+    genres = []
+    if not result['release-list']:
+        return [] #no list was found
+    for (idx, release) in enumerate(result['release-list']):
+        if not 'artist-credit-phrase' in release:
+            print("No artist credit name given")
+        #if not 'title' in release:
+         #   continue
+        #if not(release['title'].lower() == albumname.lower()):
+         #   continue
+        else:
+            if (release['artist-credit-phrase'].lower() == artistname.lower()):
+                if 'tag-list' in release:
+                    for tag in release['tag-list']:
+                        genres.append(tag['name'])
+    return genres
 
-def search_tags(result, artistname):
-    return show_taglist(result,artistname)
-
+# filter the search result for rating
 def get_rank(result):
     if not 'rating' in result:
             #print("No rating given")
@@ -147,6 +151,7 @@ def get_rank(result):
 def get_mb_result(artist_mbid):
     return json.loads(requests.get("http://musicbrainz.org/ws/2/artist/"+artist_mbid+"?inc=aliases+tags+ratings&fmt=json").text)
 
+# filter the search result for tags
 def get_tags(result):
     genres = []
     if not 'tags' in result:
@@ -161,6 +166,11 @@ def get_search_result(artistname, albumname, lim):
     result = musicbrainzngs.search_releases(artist=artistname, release=albumname,
                                             limit=lim)
     return result
+
+def get_recording_result(track_mbid):
+    result = json.loads(requests.get("http://musicbrainz.org/ws/2/recording/"+track_mbid+"?inc=tags+ratings&fmt=json").text)
+    return result
+
 
 # delete doubles
 def filter_genre_results(taglist):
@@ -180,18 +190,12 @@ def test():
         show_tags(result)
 
 def testrequest():
-    result = json.loads(requests.get("http://musicbrainz.org/ws/2/artist/"+artist_mbid+"?inc=aliases+tags+ratings&fmt=json").text)
+    result = json.loads(requests.get("http://musicbrainz.org/ws/2/recording/"+recording_mbid+"?inc=tags+ratings&fmt=json").text)
     show_tags(result)
 
-#csv_in = read_csv_file()
-#iterate_over_file(csv_in)
-#result = get_artist_by_id()
-#search_rank(result)
 
-#label_id = "9e0bc8d8-cb67-4a55-8ad5-603cf4fd20a8"
-#result = get_search_result(artist,album,1)
-#show_tags(result)
-#id = "05cbaf37-6dc2-4f71-a0ce-d633447d90c3"
-#result = get_mb_result(artist_mbid)
-#print(get_rank(result))
-#print(get_tags(result))
+#result = get_recording_result("805ac5ab-eafe-4520-8fb6-297eaf08f2d6")
+#print (get_rank(result))
+#result = get_search_result(artist,album,5)
+#print (search_tags(result,artist,album))
+#testrequest()
