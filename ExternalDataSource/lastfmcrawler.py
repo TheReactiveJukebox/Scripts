@@ -94,15 +94,15 @@ notfound_mb_track_rank = 0
 
 
 for rownum, row in enumerate(csv_in):
-	if rownum > 50:
-		break
+	#if rownum > 50:
+	#	break
 
 	if (len(row) <= 3):  # line too short
 		continue
 
 	if (rownum == 0): #header
 		csv_out.writerow(('title', 'artist', 'album', 'songHash', 'length', 'published', 'trackmbid', 'artistmbid',
-						  'albummbid', 'playcount', 'listeners', 'albumcover', 'genres', 'rating', 'trackRating'))
+						  'albummbid', 'playcount', 'listeners', 'albumcover', 'genres', 'artistrating', 'trackrating'))
 		continue  # next row
 
 	title = row[0]
@@ -200,7 +200,7 @@ for rownum, row in enumerate(csv_in):
 			notfound_lfm_tags += 1
 	tags=lfm_tags
 
-	
+
 	if lfm_artistmbid != '':
 		mb_another_result = mbcyag.get_mb_result(lfm_artistmbid) #search for infos about ratings and tags by the artist-id
 		mb_another_tags = mbcyag.get_tags(mb_another_result) # get tags from MusicBrianz by artist (and not by recording!!!)
@@ -210,8 +210,8 @@ for rownum, row in enumerate(csv_in):
 			notfound_mb_rank += 1
 	else:
 		notfound_mb_rank += 1
-		
-		
+
+
 	if lfm_trackmbid != '':
 		mb_recording_result = mbcyag.get_recording_result(lfm_trackmbid) # search for infos about ratings by the recording-id (track-id)
 		mb_track_rating = mbcyag.get_rank(mb_recording_result)[1] # get track rating value
@@ -238,7 +238,6 @@ for rownum, row in enumerate(csv_in):
 
 	track_genres=[x for x in tags if x in genres] #search for tags with a genre
 	track_genres=mbcyag.filter_genre_results(track_genres) #filter out duplicates
-	#track_genres = tags  #For Testing, use all tags as genres
 
 	published = mbcyag.search_releases(mb_result,artist,lfm_album) #get oldest release date
 	if published==0:
@@ -253,6 +252,9 @@ for rownum, row in enumerate(csv_in):
 	counter, notfound_track, notfound_lfm_track, notfound_lfm_playcount, notfound_lfm_listeners, notfound_lfm_trackmbid,
 	notfound_lfm_artistmbid, notfound_lfm_albummbid, notfound_lfm_album,
 	notfound_lfm_albumcover, notfound_lfm_tags, notfound_mb_tags, notfound_mb_release,notfound_mb_rank))
+
+	if len(lfm_album)==0: #no album found in last fm
+		lfm_album=album #use id3 album
 
 	try:
 		csv_out.writerow((title, artist, lfm_album, songHash, length, published, lfm_trackmbid, lfm_artistmbid,
