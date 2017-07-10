@@ -1,9 +1,11 @@
-from datetime import date
+from datetime import date, datetime
 
 import psycopg2
 import csv
 
 # Hopefully no song will be called like this ;)
+import re
+
 SKIP = "1c73b71e7e1364f2eda6007749a93fe9dc90b844b27a121de985e78b1aa3aa82"
 
 
@@ -36,8 +38,8 @@ cur.execute("TRUNCATE TABLE album CASCADE; TRUNCATE TABLE artist CASCADE; TRUNCA
 
 # insert artist
 cur.execute("PREPARE insert_artist AS "
-            "INSERT INTO artist (NameNormalized, Name, MusicBrainzId) "
-            "VALUES ($1, $2, $3) "
+            "INSERT INTO artist (NameNormalized, Name, MusicBrainzId, Rating) "
+            "VALUES ($1, $2, $3, $4) "
             "ON CONFLICT (NameNormalized) DO UPDATE SET NameNormalized = EXCLUDED.NameNormalized "
             "RETURNING Id;")
 
@@ -95,7 +97,7 @@ next(data)  # skip first line containing headlines for each column
 for row in data:
     # row has the structure:
     # [0title, 1artist, 2album, 3songHash, 4length, 5published, 6trackmbid,
-    #  7artistmbid, 8albummbid, 9playcount, 10listeners, 11albumcover, 12genres]
+    #  7artistmbid, 8albummbid, 9playcount, 10listeners, 11albumcover, 12genres, 13rating]
     titleNorm = normalize_name(row[0])
     if titleNorm == SKIP:
         print(("Title skipped:", row[0], titleNorm))
@@ -109,16 +111,29 @@ for row in data:
         print(("Album skipped:", row[2], albumNorm))
         continue
 
-    cur.execute("EXECUTE insert_artist (%s, %s, %s)", (artistNorm, row[1], row[7]))
+    rating = 0 if row[13] is "" else float(row[13])
+    cur.execute("EXECUTE insert_artist (%s, %s, %s, %s)", (artistNorm, row[1], row[7], rating))
     artistid = cur.fetchone()[0]
     cur.execute("EXECUTE insert_album (%s, %s, %s)", (albumNorm, row[2], row[8]))
     albumid = cur.fetchone()[0]
     cur.execute("EXECUTE connect_artist_album (%s, %s)", (artistid, albumid))
+    if re.compile("\d*-\d*-\d*").match(row[5]):
+        release_date = datetime.strptime(row[5], "%Y-%m-%d")
+    elif re.compile("\d*-\d*").match(row[5]):
+        release_date = datetime.strptime(row[5], "%Y-%m")
+    elif row[5] is not "":
+        release_date = datetime.strptime(row[5], "%Y")
+    else:
+        release_date = None
     cur.execute("EXECUTE insert_song (%s, %s, %s, %s, %s, %s, %s, %s, %s)",
-                (titleNorm, row[0], albumid, row[3], int(row[4]), date(2000, 1, 1), row[6], int(row[9]), int(row[10])))
+                (titleNorm, row[0], albumid, row[3], int(row[4]), release_date, row[6], int(row[9]), int(row[10])))
     songid = cur.fetchone()[0]
     cur.execute("EXECUTE connect_song_artist (%s, %s)", (artistid, songid))
-    for gen in row[12]:
+    genList = row[12].replace("'", "")
+    genList = genList.replace("[", "")
+    genList = genList.replace("]", "")
+    genList = genList.split(",")
+    for gen in genList:
         if gen in genres:
             cur.execute("EXECUTE connect_song_genre (%s, %s)", (songid, genres[gen]))
 
