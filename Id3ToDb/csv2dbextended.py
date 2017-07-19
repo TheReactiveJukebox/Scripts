@@ -45,8 +45,8 @@ cur.execute("PREPARE insert_artist AS "
 
 # insert album
 cur.execute("PREPARE insert_album AS "
-            "INSERT INTO album (TitleNormalized, Title, MusicBrainzId) "
-            "VALUES ($1, $2, $3) "
+            "INSERT INTO album (TitleNormalized, Title, Cover, MusicBrainzId) "
+            "VALUES ($1, $2, $3, $4) "
             "ON CONFLICT (TitleNormalized) DO UPDATE SET TitleNormalized = EXCLUDED.TitleNormalized "
             "RETURNING Id;")
 
@@ -91,7 +91,7 @@ for row in genre_data:
     i += 1
 genre_in.close()
 
-file_in = open("data.csv", "r")
+file_in = open("data.csv", "r", encoding="utf-8")
 data = csv.reader(file_in)
 next(data)  # skip first line containing headlines for each column
 for row in data:
@@ -114,7 +114,7 @@ for row in data:
     rating = 0 if row[13] is "" else float(row[13])
     cur.execute("EXECUTE insert_artist (%s, %s, %s, %s)", (artistNorm, row[1], row[7], rating))
     artistid = cur.fetchone()[0]
-    cur.execute("EXECUTE insert_album (%s, %s, %s)", (albumNorm, row[2], row[8]))
+    cur.execute("EXECUTE insert_album (%s, %s, %s, %s)", (albumNorm, row[2], row[11], row[8]))
     albumid = cur.fetchone()[0]
     cur.execute("EXECUTE connect_artist_album (%s, %s)", (artistid, albumid))
     if re.compile("\d*-\d*-\d*").match(row[5]):
