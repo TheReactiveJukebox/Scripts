@@ -26,6 +26,14 @@ csv_out = csv.writer(csv_outfile, delimiter=',')
 csv_infile = open('data.csv', "r", encoding="utf-8")
 csv_in = csv.reader(csv_infile, delimiter=',')
 
+bpm_dict = {}
+
+# read genres
+with open("bpm_all.csv", "r", encoding="utf-8") as csv_bpmfile:
+    csv_bpm = csv.reader(csv_bpmfile, delimiter=',')
+    for rownum, row in enumerate(csv_bpm):
+        bpm_dict[row[0]] = row[1]
+
 not_found_counter = 0
 
 for rownum, row in enumerate(csv_in):
@@ -54,6 +62,12 @@ for rownum, row in enumerate(csv_in):
         feature_request = requests.get(constants.spotifyBaseUrl + "/audio-features/" + track_id,
                                        params=feature_request_param)
         feature_data = feature_request.json()
+
+        if abs(float(feature_data["tempo"]) - float(bpm_dict[row[3]])) > 20:
+            print("[1] CSV: " + bpm_dict[row[3]] + "BPM " + row[1] + " - " + row[0])
+            print("[2] Spt: " + str(feature_data["tempo"]) + "BPM " + search_data["tracks"]["items"][0]["artists"][0]["name"]
+                  + " - " + search_data["tracks"]["items"][0]["name"])
+
         csv_out.writerow((row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7],
                           row[8], row[9], row[10], row[11], row[12], row[13], row[14],
                           feature_data["tempo"], feature_data["danceability"], feature_data["energy"],
