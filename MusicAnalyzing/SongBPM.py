@@ -45,6 +45,9 @@ if __name__ == '__main__':
 
     #print(files)
 
+    #1592 didnt work:  f13dbd1ccb62e9262979f2763488d6be8882507c5fee47a45c64981005ec2289.mp3
+    #files=files[1593:] #use only a part of all files
+
     for ifile,filename in enumerate(files):
         filename_absolute=songbasepath+"/"+filename[0]+"/"+filename[1]+"/"+filename[2:]
         songHash=filename[0:-4] #remove .mp3 to get song hash
@@ -60,7 +63,7 @@ if __name__ == '__main__':
         print("  BPM="+str(bpm))
         csv_out.writerow((songHash, bpm)) #write row to csv
 
-        timeRemaining=(time.time()-starttime)/(ifile+1) * len(files) - (time.time()-starttime) / 1000
+        timeRemaining=((time.time()-starttime)/(ifile+1) * len(files) - (time.time()-starttime) )
         print("  Remaining Time:"+str(round(timeRemaining/60))+"m"+str(round(timeRemaining%60))+"s")
 
     print('done!')
