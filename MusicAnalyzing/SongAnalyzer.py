@@ -4,7 +4,7 @@
 #pip install librosa
 #pip install scikits.samplerate
 
-#remove f13dbd1ccb62e9262979f2763488d6be8882507c5fee47a45c64981005ec2289.mp3 from songs (broken)
+#manually remove f13dbd1ccb62e9262979f2763488d6be8882507c5fee47a45c64981005ec2289.mp3 from songs (broken)
 
 from __future__ import print_function
 
@@ -17,8 +17,13 @@ import time
 
 import Dynamics
 
+
+songbasepath="/media/fisch/HDD/Uni/PG/Musik PG"
+
 #mode="bpm"
 mode="dynamics"
+
+
 
 
 def beat_track(y,sr):
@@ -32,7 +37,7 @@ def beat_track(y,sr):
 if __name__ == '__main__':
     starttime=time.time()
 
-    songbasepath="/media/fisch/HDD/Uni/PG/Musik PG"
+
     hashdirs=['0','1','2','3','4','5','6','7','8','9','a','b','c','d','e','f']
 
 

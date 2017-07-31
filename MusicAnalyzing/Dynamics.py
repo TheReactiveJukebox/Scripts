@@ -52,7 +52,7 @@ if __name__ == '__main__':
 	#y, sr = librosa.load(librosa.util.example_audio_file())
 
 	#.399
-	#y, sr = librosa.load("/media/fisch/HDD/Uni/PG/Musik PG/0/1/93332b831b0702e207f53f9b3396167eb2b89451327c4c96ec25d8316095bc.mp3",sr=44100)
+	y, sr = librosa.load("/media/fisch/HDD/Uni/PG/Musik PG/0/1/93c5854e8115b64a82817b2b3013d97061a07e4aa8d2ad2fe6081bbeb64fc8.mp3",sr=44100)
 
 	#.6
 	#y, sr = librosa.load("/media/fisch/HDD/Uni/PG/Musik PG/0/1/93c5854e8115b64a82817b2b3013d97061a07e4aa8d2ad2fe6081bbeb64fc8.mp3",sr=44100)
@@ -61,7 +61,12 @@ if __name__ == '__main__':
 	#y, sr = librosa.load("/media/fisch/HDD/Uni/PG/Musik PG/0/1/f97dcffdbdf7e52efae73792ad63a335d9bbfcae66e5718aac8eee21485a0d.mp3",sr=44100)
 
 	#.27  kraftklub - zwei dosen sprite
-	y, sr = librosa.load("/media/fisch/HDD/Uni/PG/Musik PG/0/8/ee073fabed3393543b1ce23f3e298ea8286eb2030d8e63083e76f3a265cf6a.mp3",sr=44100)
+	#y, sr = librosa.load("/media/fisch/HDD/Uni/PG/Musik PG/0/8/ee073fabed3393543b1ce23f3e298ea8286eb2030d8e63083e76f3a265cf6a.mp3",sr=44100)
+
+	#minimum 93c6424646f1b1b1281fc412ee52fadf71aa96aa2706fe5308b7a3e64b73b2d5  0.1350618028
+	#y, sr = librosa.load("/media/fisch/HDD/Uni/PG/Musik PG/9/3/c6424646f1b1b1281fc412ee52fadf71aa96aa2706fe5308b7a3e64b73b2d5.mp3",sr=44100)
+	#maximum 140a2592c3bdb5fd0458d845355cf3803d1a68fe5428ae8d2d15d6f955d479b7   0.7276209304
+	#y, sr = librosa.load("/media/fisch/HDD/Uni/PG/Musik PG/1/4/0a2592c3bdb5fd0458d845355cf3803d1a68fe5428ae8d2d15d6f955d479b7.mp3",sr=44100)
 
 
 
