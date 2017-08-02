@@ -93,6 +93,14 @@ for row in genre_data:
     i += 1
 genre_in.close()
 
+bpm_in = open("bpm_librosa.csv", "r")
+bpm_data = csv.reader(bpm_in)
+bpm_dict = {}
+next(bpm_data)
+for row in bpm_data:
+    bpm_dict[row[0]] = float(row[1])
+bpm_in.close()
+
 file_in = open("data.csv", "r", encoding="utf-8")
 data = csv.reader(file_in)
 next(data)  # skip first line containing headlines for each column
@@ -131,7 +139,7 @@ for row in data:
         release_date = None
 
     track_rating = 0 if row[14] is "" else float(row[14])
-    bpm = 0 if row[15] is "" else float(row[15])
+    bpm = bpm_dict[row[3]] if row[15] is "" or row[15] is "0" else float(row[15])     # take librosa data if no spotify data is available
     danceability = 0 if row[16] is "" else float(row[16])
     energy = 0 if row[17] is "" else float(row[17])
     loudness = 0 if row[18] is "" else float(row[18])
