@@ -60,8 +60,8 @@ cur.execute("PREPARE connect_artist_album AS "
 cur.execute("PREPARE insert_song AS "
             "INSERT INTO song (TitleNormalized, Title, AlbumId, Hash, Duration, Published, MusicBrainzId, Playcount, "
             "Listeners, Rating, Bpm, Danceability, Energy, Loudness, Speechiness, Acousticness, Instrumentalness, "
-            "Liveness, Dynamics) "
-            "VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19) "
+            "Liveness, Valence, Dynamics) "
+            "VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20) "
             "ON CONFLICT (TitleNormalized) DO UPDATE SET TitleNormalized = EXCLUDED.TitleNormalized "
             "RETURNING Id;")
 
@@ -117,7 +117,7 @@ for row in data:
     # [0title, 1artist, 2album, 3songHash, 4length, 5published, 6trackmbid,
     # 7artistmbid, 8albummbid, 9playcount, 10listeners, 11albumcover, 12genres, 13artistrating
     # 14trackrating, 15bpm, 16danceability, 17energy, 18loudness, 19speechiness, 20acousticness,
-    # 21instrumentalness, 22liveness]
+    # 21instrumentalness, 22liveness, 23valence]
     titleNorm = normalize_name(row[0])
     if titleNorm == SKIP:
         print(("Title skipped:", row[0], titleNorm))
@@ -155,10 +155,11 @@ for row in data:
     acousticness = 0 if row[20] is "" else float(row[20])
     instrumentalness = 0 if row[21] is "" else float(row[21])
     liveness = 0 if row[22] is "" else float(row[22])
-    cur.execute("EXECUTE insert_song (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
+    valence = 0 if row[23] is "" else float(row[23])
+    cur.execute("EXECUTE insert_song (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
                 (titleNorm, row[0], albumid, row[3], int(row[4]), release_date, row[6], int(row[9]),
                  int(row[10]), track_rating, bpm, danceability, energy, loudness, speechiness, acousticness,
-                 instrumentalness, liveness, dynamics_dict[row[3]]))
+                 instrumentalness, liveness, valence, dynamics_dict[row[3]]))
     songid = cur.fetchone()[0]
     cur.execute("EXECUTE connect_song_artist (%s, %s)", (artistid, songid))
     genList = row[12].replace("'", "")

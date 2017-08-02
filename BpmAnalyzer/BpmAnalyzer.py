@@ -41,7 +41,7 @@ for rownum, row in enumerate(csv_in):
         csv_out.writerow(('title', 'artist', 'album', 'songHash', 'length', 'published', 'trackmbid', 'artistmbid',
                           'albummbid', 'playcount', 'listeners', 'albumcover', 'genres', 'artistrating', 'trackrating',
                           'bpm', 'danceability', 'energy', 'loudness', 'speechiness', 'acousticness',
-                          'instrumentalness', 'liveness'))
+                          'instrumentalness', 'liveness', 'valence'))
         continue  # next row
 
     search_request_param = {"access_token": access_token,
@@ -55,7 +55,7 @@ for rownum, row in enumerate(csv_in):
     if len(search_data["tracks"]["items"]) == 0:
         not_found_counter += 1
         csv_out.writerow((row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7],
-                          row[8], row[9], row[10], row[11], row[12], row[13], row[14], 0, 0, 0, 0, 0, 0, 0, 0))
+                          row[8], row[9], row[10], row[11], row[12], row[13], row[14], 0, 0, 0, 0, 0, 0, 0, 0, 0))
     else:
         track_id = search_data["tracks"]["items"][0]["id"]
         feature_request_param = {"access_token": access_token}
@@ -72,7 +72,7 @@ for rownum, row in enumerate(csv_in):
                           row[8], row[9], row[10], row[11], row[12], row[13], row[14],
                           feature_data["tempo"], feature_data["danceability"], feature_data["energy"],
                           feature_data["loudness"], feature_data["speechiness"], feature_data["acousticness"],
-                          feature_data["instrumentalness"], feature_data["liveness"]))
+                          feature_data["instrumentalness"], feature_data["liveness"], feature_data["valence"]))
 
 
 print(not_found_counter)
