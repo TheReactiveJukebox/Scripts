@@ -58,8 +58,8 @@ cur.execute("PREPARE connect_artist_album AS "
 
 # insert song and connect it to album
 cur.execute("PREPARE insert_song AS "
-            "INSERT INTO song (TitleNormalized, Title, AlbumId, Hash, Duration, Published, MusicBrainzId, Playcount, Listeners) "
-            "VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) "
+            "INSERT INTO song (TitleNormalized, Title, AlbumId, Hash, Duration, Published, MusicBrainzId, Playcount, Listeners, Rating) "
+            "VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) "
             "ON CONFLICT (TitleNormalized) DO UPDATE SET TitleNormalized = EXCLUDED.TitleNormalized "
             "RETURNING Id;")
 
@@ -97,7 +97,8 @@ next(data)  # skip first line containing headlines for each column
 for row in data:
     # row has the structure:
     # [0title, 1artist, 2album, 3songHash, 4length, 5published, 6trackmbid,
-    #  7artistmbid, 8albummbid, 9playcount, 10listeners, 11albumcover, 12genres, 13rating]
+    #  7artistmbid, 8albummbid, 9playcount, 10listeners, 11albumcover, 12genres, 13artistrating
+    #  14trackrating]
     titleNorm = normalize_name(row[0])
     if titleNorm == SKIP:
         print(("Title skipped:", row[0], titleNorm))
@@ -125,8 +126,14 @@ for row in data:
         release_date = datetime.strptime(row[5], "%Y")
     else:
         release_date = None
-    cur.execute("EXECUTE insert_song (%s, %s, %s, %s, %s, %s, %s, %s, %s)",
-                (titleNorm, row[0], albumid, row[3], int(row[4]), release_date, row[6], int(row[9]), int(row[10])))
+
+    if row[14] is "":
+        track_rating = 0
+    else:
+        track_rating = float(row[14])
+    cur.execute("EXECUTE insert_song (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
+                (titleNorm, row[0], albumid, row[3], int(row[4]), release_date, row[6], int(row[9]),
+                 int(row[10]), track_rating))
     songid = cur.fetchone()[0]
     cur.execute("EXECUTE connect_song_artist (%s, %s)", (artistid, songid))
     genList = row[12].replace("'", "")
