@@ -112,8 +112,8 @@ for row in data:
         print(("Album skipped:", row[2], albumNorm))
         continue
 
-    rating = 0 if row[13] is "" else float(row[13])
-    cur.execute("EXECUTE insert_artist (%s, %s, %s, %s)", (artistNorm, row[1], row[7], rating))
+    artist_rating = 0 if row[13] is "" else float(row[13])
+    cur.execute("EXECUTE insert_artist (%s, %s, %s, %s)", (artistNorm, row[1], row[7], artist_rating))
     artistid = cur.fetchone()[0]
     cur.execute("EXECUTE insert_album (%s, %s, %s, %s)", (albumNorm, row[2], row[11], row[8]))
     albumid = cur.fetchone()[0]
@@ -127,10 +127,7 @@ for row in data:
     else:
         release_date = None
 
-    if row[14] is "":
-        track_rating = 0
-    else:
-        track_rating = float(row[14])
+    track_rating = 0 if row[14] is "" else float(row[14])
     cur.execute("EXECUTE insert_song (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
                 (titleNorm, row[0], albumid, row[3], int(row[4]), release_date, row[6], int(row[9]),
                  int(row[10]), track_rating))
