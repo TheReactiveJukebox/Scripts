@@ -60,8 +60,8 @@ cur.execute("PREPARE connect_artist_album AS "
 cur.execute("PREPARE insert_song AS "
             "INSERT INTO song (TitleNormalized, Title, AlbumId, Hash, Duration, Published, MusicBrainzId, Playcount, "
             "Listeners, Rating, Bpm, Danceability, Energy, Loudness, Speechiness, Acousticness, Instrumentalness, "
-            "Liveness) "
-            "VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18) "
+            "Liveness, Dynamics) "
+            "VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19) "
             "ON CONFLICT (TitleNormalized) DO UPDATE SET TitleNormalized = EXCLUDED.TitleNormalized "
             "RETURNING Id;")
 
@@ -100,6 +100,14 @@ next(bpm_data)
 for row in bpm_data:
     bpm_dict[row[0]] = float(row[1])
 bpm_in.close()
+
+dynamics_in = open("dynamics.csv", "r")
+dynamics_data = csv.reader(dynamics_in)
+dynamics_dict = {}
+next(dynamics_data)
+for row in dynamics_data:
+    dynamics_dict[row[0]] = float(row[1])
+dynamics_in.close()
 
 file_in = open("data.csv", "r", encoding="utf-8")
 data = csv.reader(file_in)
@@ -147,10 +155,10 @@ for row in data:
     acousticness = 0 if row[20] is "" else float(row[20])
     instrumentalness = 0 if row[21] is "" else float(row[21])
     liveness = 0 if row[22] is "" else float(row[22])
-    cur.execute("EXECUTE insert_song (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
+    cur.execute("EXECUTE insert_song (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
                 (titleNorm, row[0], albumid, row[3], int(row[4]), release_date, row[6], int(row[9]),
                  int(row[10]), track_rating, bpm, danceability, energy, loudness, speechiness, acousticness,
-                 instrumentalness, liveness))
+                 instrumentalness, liveness, dynamics_dict[row[3]]))
     songid = cur.fetchone()[0]
     cur.execute("EXECUTE connect_song_artist (%s, %s)", (artistid, songid))
     genList = row[12].replace("'", "")
