@@ -58,8 +58,10 @@ cur.execute("PREPARE connect_artist_album AS "
 
 # insert song and connect it to album
 cur.execute("PREPARE insert_song AS "
-            "INSERT INTO song (TitleNormalized, Title, AlbumId, Hash, Duration, Published, MusicBrainzId, Playcount, Listeners, Rating) "
-            "VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) "
+            "INSERT INTO song (TitleNormalized, Title, AlbumId, Hash, Duration, Published, MusicBrainzId, Playcount, "
+            "Listeners, Rating, Bpm, Danceability, Energy, Loudness, Speechiness, Acousticness, Instrumentalness, "
+            "Liveness) "
+            "VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18) "
             "ON CONFLICT (TitleNormalized) DO UPDATE SET TitleNormalized = EXCLUDED.TitleNormalized "
             "RETURNING Id;")
 
@@ -97,8 +99,9 @@ next(data)  # skip first line containing headlines for each column
 for row in data:
     # row has the structure:
     # [0title, 1artist, 2album, 3songHash, 4length, 5published, 6trackmbid,
-    #  7artistmbid, 8albummbid, 9playcount, 10listeners, 11albumcover, 12genres, 13artistrating
-    #  14trackrating]
+    # 7artistmbid, 8albummbid, 9playcount, 10listeners, 11albumcover, 12genres, 13artistrating
+    # 14trackrating, 15bpm, 16danceability, 17energy, 18loudness, 19speechiness, 20acousticness,
+    # 21instrumentalness, 22liveness]
     titleNorm = normalize_name(row[0])
     if titleNorm == SKIP:
         print(("Title skipped:", row[0], titleNorm))
@@ -128,9 +131,18 @@ for row in data:
         release_date = None
 
     track_rating = 0 if row[14] is "" else float(row[14])
-    cur.execute("EXECUTE insert_song (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
+    bpm = 0 if row[15] is "" else float(row[15])
+    danceability = 0 if row[16] is "" else float(row[16])
+    energy = 0 if row[17] is "" else float(row[17])
+    loudness = 0 if row[18] is "" else float(row[18])
+    speechiness = 0 if row[19] is "" else float(row[19])
+    acousticness = 0 if row[20] is "" else float(row[20])
+    instrumentalness = 0 if row[21] is "" else float(row[21])
+    liveness = 0 if row[22] is "" else float(row[22])
+    cur.execute("EXECUTE insert_song (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
                 (titleNorm, row[0], albumid, row[3], int(row[4]), release_date, row[6], int(row[9]),
-                 int(row[10]), track_rating))
+                 int(row[10]), track_rating, bpm, danceability, energy, loudness, speechiness, acousticness,
+                 instrumentalness, liveness))
     songid = cur.fetchone()[0]
     cur.execute("EXECUTE connect_song_artist (%s, %s)", (artistid, songid))
     genList = row[12].replace("'", "")
