@@ -6,6 +6,8 @@ import csv
 # Hopefully no song will be called like this ;)
 import re
 
+import sys
+
 SKIP = "1c73b71e7e1364f2eda6007749a93fe9dc90b844b27a121de985e78b1aa3aa82"
 
 
@@ -83,8 +85,13 @@ cur.execute("PREPARE connect_song_genre AS "
             "VALUES ($1, $2) "
             "ON CONFLICT (SongId, GenreId) DO NOTHING;")
 
+data_file = sys.argv[1]
+genre_file = sys.argv[2]
+bpm_librosa_file = sys.argv[3]
+dynamics_librosa_file = sys.argv[4]
+
 genres = {}
-genre_in = open("genres.csv", "r")
+genre_in = open(genre_file, "r")
 genre_data = csv.reader(genre_in)
 i = 1
 for row in genre_data:
@@ -93,7 +100,7 @@ for row in genre_data:
     i += 1
 genre_in.close()
 
-bpm_in = open("bpm_librosa.csv", "r")
+bpm_in = open(bpm_librosa_file, "r")
 bpm_data = csv.reader(bpm_in)
 bpm_dict = {}
 next(bpm_data)
@@ -101,7 +108,7 @@ for row in bpm_data:
     bpm_dict[row[0]] = float(row[1])
 bpm_in.close()
 
-dynamics_in = open("dynamics.csv", "r")
+dynamics_in = open(dynamics_librosa_file, "r")
 dynamics_data = csv.reader(dynamics_in)
 dynamics_dict = {}
 next(dynamics_data)
@@ -109,7 +116,7 @@ for row in dynamics_data:
     dynamics_dict[row[0]] = float(row[1])
 dynamics_in.close()
 
-file_in = open("data.csv", "r", encoding="utf-8")
+file_in = open(data_file, "r", encoding="utf-8")
 data = csv.reader(file_in)
 next(data)  # skip first line containing headlines for each column
 for row in data:

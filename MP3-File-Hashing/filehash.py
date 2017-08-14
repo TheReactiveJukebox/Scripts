@@ -2,8 +2,9 @@
 
 import os
 import hashlib
+import sys
 
-path = "."
+path = sys.argv[1]
 
 
 def rename():

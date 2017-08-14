@@ -3,6 +3,7 @@ import logging
 
 import constants
 import requests
+import sys
 from oauthtool import implicit_flow
 
 
@@ -18,21 +19,24 @@ def _authorize():
     return auth_response["access_token"]
 
 
-access_token = _authorize()
+# access_token = _authorize()
+access_token = "123"
 
-csv_outfile = open("data_out.csv", "w", encoding="utf-8", newline="")
+csv_outfile = open("spotifydata.csv", "w", encoding="utf-8", newline="")
 csv_out = csv.writer(csv_outfile, delimiter=',')
 
-csv_infile = open('data.csv', "r", encoding="utf-8")
+infile = sys.argv[1]
+
+csv_infile = open(infile, "r", encoding="utf-8")
 csv_in = csv.reader(csv_infile, delimiter=',')
 
-bpm_dict = {}
-
-# read genres
-with open("bpm_all.csv", "r", encoding="utf-8") as csv_bpmfile:
-    csv_bpm = csv.reader(csv_bpmfile, delimiter=',')
-    for rownum, row in enumerate(csv_bpm):
-        bpm_dict[row[0]] = row[1]
+# bpm_dict = {}
+#
+# # read bpm from librosa
+# with open("bpm_all.csv", "r", encoding="utf-8") as csv_bpmfile:
+#     csv_bpm = csv.reader(csv_bpmfile, delimiter=',')
+#     for rownum, row in enumerate(csv_bpm):
+#         bpm_dict[row[0]] = row[1]
 
 not_found_counter = 0
 
@@ -63,10 +67,10 @@ for rownum, row in enumerate(csv_in):
                                        params=feature_request_param)
         feature_data = feature_request.json()
 
-        if abs(float(feature_data["tempo"]) - float(bpm_dict[row[3]])) > 20:
-            print("[1] CSV: " + bpm_dict[row[3]] + "BPM " + row[1] + " - " + row[0])
-            print("[2] Spt: " + str(feature_data["tempo"]) + "BPM " + search_data["tracks"]["items"][0]["artists"][0]["name"]
-                  + " - " + search_data["tracks"]["items"][0]["name"])
+        # if abs(float(feature_data["tempo"]) - float(bpm_dict[row[3]])) > 20:
+        #     print("[1] CSV: " + bpm_dict[row[3]] + "BPM " + row[1] + " - " + row[0])
+        #     print("[2] Spt: " + str(feature_data["tempo"]) + "BPM " + search_data["tracks"]["items"][0]["artists"][0]["name"]
+        #           + " - " + search_data["tracks"]["items"][0]["name"])
 
         csv_out.writerow((row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7],
                           row[8], row[9], row[10], row[11], row[12], row[13], row[14],
