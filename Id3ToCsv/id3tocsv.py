@@ -12,7 +12,7 @@ SKIP = "1c73b71e7e1364f2eda6007749a93fe9dc90b844b27a121de985e78b1aa3aa82"
 
 out = open("id3data.csv", "w", newline="")
 csv_out = csv.writer(out)
-csv_out.writerow(("title", "artist", "album", "songHash", "length"))
+csv_out.writerow(("title", "artist", "album", "songHash", "length", "published"))
 
 chars = "0123456789abcdef"
 
@@ -29,7 +29,10 @@ for i in chars:
             title = audio["title"][0]
             artist = audio["artist"][0]
             album = audio["album"][0]
+            published = None
+            if "date" in audio.keys():
+                published = audio["date"][0]
 
-            csv_out.writerow((title, artist, album, songHash, length))
+            csv_out.writerow((title, artist, album, songHash, length, published))
 
 out.close()
