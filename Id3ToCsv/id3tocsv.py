@@ -1,3 +1,5 @@
+#pip3 install mutagen
+#run script w/ python3: python3 id3tocsv.py /media/user/path\ to\ mp3_files
 import os
 
 from mutagen.easyid3 import EasyID3

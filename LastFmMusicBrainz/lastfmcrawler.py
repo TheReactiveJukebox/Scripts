@@ -117,7 +117,8 @@ for rownum, row in enumerate(csv_in):
     album = row[2]
     songHash = row[3]
     length = row[4]
-    # print(str(rownum) + " t=" + str(round(time.time() - timestart)) + ": " + artist + " - " + title)
+    published = row[5] #not available for all
+    print(str(rownum) + " t=" + str(round(time.time() - timestart)) + ": " + artist + " - " + title)
 
     apiParams = '&api_key=a8b40052edf6a8ce494429b0b3b10f91&artist=%s&track=%s&user=RJ&format=json' % (
         urllib.parse.quote(artist, safe=''), urllib.parse.quote(title, safe=''))
@@ -248,10 +249,12 @@ for rownum, row in enumerate(csv_in):
     track_genres = [x for x in tags if x in genres]  # search for tags with a genre
     track_genres = mbcyag.filter_genre_results(track_genres)  # filter out duplicates
 
-    published = mbcyag.search_releases(mb_result, artist, lfm_album)  # get oldest release date
-    if published == 0:
-        published = ''
-        notfound_mb_release += 1
+    if published=='':
+        mb_published = mbcyag.search_releases(mb_result, artist, lfm_album)  # get oldest release date
+        if mb_published == 0:
+            mb_published = ''
+            notfound_mb_release += 1
+        published=mb_published #use musicbrainz published date if no published dated was previously given
 
     for g in tags:  # add tags from current track to genrecount dict
         genrecount[g] = genrecount.get(g, 0) + 1
@@ -262,8 +265,8 @@ for rownum, row in enumerate(csv_in):
     #    notfound_lfm_artistmbid, notfound_lfm_albummbid, notfound_lfm_album,
     #    notfound_lfm_albumcover, notfound_lfm_tags, notfound_mb_tags, notfound_mb_release, notfound_mb_rank))
 
-    if len(lfm_album) == 0:  # no album found in last fm
-        lfm_album = album  # use id3 album
+    if len(album) == 0:  # no album in id3
+        album = lfm_album  # use last.fm album (normally all mp3's have album names given)
 
     try:
         csv_out.writerow((title, artist, album, songHash, length, published, lfm_trackmbid, lfm_artistmbid,
