@@ -6,7 +6,7 @@ read lastfm
 if [ ${lastfm} == "y" ]
 then
     echo "Fetching data, this could take a few minutes..."
-    python ./LastFmMusicBrainz/lastfmcrawler.py ./id3data.csv ./LastFmMusicBrainz/genres.csv
+    python3 ./LastFmMusicBrainz/lastfmcrawler.py ./id3data.csv ./LastFmMusicBrainz/genres.csv
     echo "LastFM data successfully fetchted."
 elif [ ${lastfm} == "n" ]
 then
@@ -22,7 +22,7 @@ read librosabpm
 if [ ${librosabpm} == "y" ]
 then
     echo "Generating data, this could take a few minutes..."
-    python ./Librosa/SongAnalyzer.py bpm ./Music
+    python3 ./Librosa/SongAnalyzer.py bpm ./Music
     echo "BPM data successfully generated."
 elif [ ${librosabpm} == "n" ]
 then
@@ -38,7 +38,7 @@ read librosadyn
 if [ ${librosadyn} == "y" ]
 then
     echo "Generating data, this could take a few minutes..."
-    python ./Librosa/SongAnalyzer.py dynamics ./Music
+    python3 ./Librosa/SongAnalyzer.py dynamics ./Music
     echo "Dynamics data successfully generated."
 elif [ ${librosadyn} == "n" ]
 then
@@ -54,7 +54,7 @@ read spotify
 if [ ${spotify} == "y" ]
 then
     echo "Fetching data, this could take a few minutes..."
-    python ./Spotify/Spotify.py lastfmdata.csv
+    python3 ./Spotify/Spotify.py lastfmdata.csv
     echo "Spotify data successfully fetched."
 elif [ ${spotify} == "n" ]
 then
