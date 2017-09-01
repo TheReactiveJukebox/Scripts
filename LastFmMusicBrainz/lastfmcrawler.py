@@ -266,7 +266,7 @@ for rownum, row in enumerate(csv_in):
         lfm_album = album  # use id3 album
 
     try:
-        csv_out.writerow((title, artist, lfm_album, songHash, length, published, lfm_trackmbid, lfm_artistmbid,
+        csv_out.writerow((title, artist, album, songHash, length, published, lfm_trackmbid, lfm_artistmbid,
                           lfm_albummbid, lfm_playcount, lfm_listeners, lfm_albumcover, str(track_genres), mb_rating,
                           mb_track_rating))
     except:
