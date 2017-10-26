@@ -1,6 +1,6 @@
 #!/bin/bash
 
-b=4 #number of threads
+b=28 #number of threads
 for (( a=1;a<=b; a++))
 do
     #echo $a-$b
