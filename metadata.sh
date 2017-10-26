@@ -16,6 +16,7 @@ else
     exit
 fi
 
+: '
 echo "Do you want to generate BPM data from librosa? (y/n)"
 read librosabpm
 
@@ -43,6 +44,23 @@ then
 elif [ ${librosadyn} == "n" ]
 then
     echo "Skipping Librosa dynamics generation."
+else
+    echo "Wrong user input!"
+    exit
+fi
+'
+
+echo "Do you want to generate BPM and Dynamics data from librosa? (y/n)"
+read librosa
+
+if [ ${librosa} == "y" ]
+then
+    echo "Generating data, this could take a few minutes..."
+    ./Librosa/SongAnalyzerMulti.sh
+    echo "BPM and Dnyamics data successfully generated."
+elif [ ${librosa} == "n" ]
+then
+    echo "Skipping Librosa."
 else
     echo "Wrong user input!"
     exit
