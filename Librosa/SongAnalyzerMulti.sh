@@ -5,7 +5,7 @@ for (( a=1;a<=b; a++))
 do
     #echo $a-$b
     #python3 ./Librosa/SongAnalyzer.py bpm /media/fisch/HDD/Musik\ PG $a-$b
-    screen -S songanalyzer -d -m /usr/bin/python3 ./Librosa/SongAnalyzer.py bpm,dynamics ./Music PG $a-$b
+    screen -S songanalyzer -d -m /usr/bin/python3 ./Librosa/SongAnalyzer.py bpm,dynamics ./Music $a-$b
 done
 
 echo "started $b processes in screens. To see debug messages, attach w/ -> screen -r songanalyzer <- to any of them."
