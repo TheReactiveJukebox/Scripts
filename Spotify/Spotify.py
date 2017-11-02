@@ -1,5 +1,6 @@
 import csv
 import logging
+import os
 
 import constants
 import requests
@@ -18,6 +19,11 @@ def _authorize():
 
     return auth_response["access_token"]
 
+
+delete_not_found = True
+
+if delete_not_found:
+    path = sys.argv[1]
 
 # access_token = _authorize()
 access_token = "123"
@@ -58,8 +64,11 @@ for rownum, row in enumerate(csv_in):
 
     if len(search_data["tracks"]["items"]) == 0:
         not_found_counter += 1
-        csv_out.writerow((row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7],
-                          row[8], row[9], row[10], row[11], row[12], row[13], row[14], 0, 0, 0, 0, 0, 0, 0, 0, 0))
+        if delete_not_found:
+            os.remove(path + "/" + row[3][:1] + "/" + row[3][1:2] + "/" + row[3][2:])
+        else:
+            csv_out.writerow((row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7],
+                              row[8], row[9], row[10], row[11], row[12], row[13], row[14], 0, 0, 0, 0, 0, 0, 0, 0, 0))
     else:
         track_id = search_data["tracks"]["items"][0]["id"]
         feature_request_param = {"access_token": access_token}
