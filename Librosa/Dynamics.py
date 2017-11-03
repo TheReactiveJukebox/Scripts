@@ -22,7 +22,7 @@ def dynamics(y, sr):
     boxlength = round(boxtime / (hop_length / sr))
     rms = np.convolve(rms, np.ones((boxlength,)) / boxlength, mode='valid')
     rmsmean = np.mean(rms)
-    print("Mean RMS=" + str(rmsmean))
+    #print("Mean RMS=" + str(rmsmean))
     # testplot(rms,"RMS Filtered")
 
     belowmeancount = 0
@@ -31,7 +31,7 @@ def dynamics(y, sr):
             belowmeancount += 1
 
     lowenergy = belowmeancount / np.shape(rms)[0]
-    print(str(belowmeancount) + " below mean out of " + str(np.shape(rms)[0]) + " samples, lowenergy=" + str(lowenergy))
+    #print(str(belowmeancount) + " below mean out of " + str(np.shape(rms)[0]) + " samples, lowenergy=" + str(lowenergy))
 
     return lowenergy
 

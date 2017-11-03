@@ -1,6 +1,6 @@
 #!/bin/bash
 
-b=28 #number of threads
+b=20 #number of threads
 for (( a=1;a<=b; a++))
 do
     #echo $a-$b
@@ -16,7 +16,7 @@ done
 echo "all processes finished"
 
 python3 ./Librosa/mergecsv.py bpm.csv $b #merges all bpm.csv_... to bpm.csv
-rm bpm.csv_* #remove all temp files
+#rm bpm.csv_* #remove all temp files
 
 python3 ./Librosa/mergecsv.py dynamics.csv $b #merges all dynamics.csv_... to dynamics.csv
-rm dynamics.csv_* #remove all temp files
+#rm dynamics.csv_* #remove all temp files
