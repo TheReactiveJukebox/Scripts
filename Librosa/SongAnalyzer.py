@@ -99,14 +99,23 @@ if __name__ == '__main__':
             bpm = beat_track(y, sr)  # analyze bpm
             # print("  BPM=" + str(bpm))
             csv_out_bpm.writerow((songHash, bpm))  # write row to csv
+            out_bpm.flush()
 
         if 'dynamics' in mode:
             #### Dynamics ####
             dyn = Dynamics.dynamics(y, sr)  # analyze dynamics
             # print("  Dyn=" + str(dyn))
             csv_out_dynamics.writerow((songHash, dyn))  # write row to csv
+            out_dynamics.flush()
 
         timeRemaining = ((time.time() - starttime) / (ifile + 1) * len(files) - (time.time() - starttime))
         print("  Remaining Time:" + str(round(timeRemaining / 60)) + "m" + str(round(timeRemaining % 60)) + "s")
+
+
+    if 'bpm' in mode:
+        out_bpm.close()
+
+    if 'dynamics' in mode:
+        out_dynamics.close()
 
     print('done!')
