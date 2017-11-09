@@ -72,7 +72,7 @@ read spotify
 if [ ${spotify} == "y" ]
 then
     echo "Fetching data, this could take a few minutes..."
-    python3 ./Spotify/Spotify.py lastfmdata.csv
+    python3 ./Spotify/Spotify.py lastfmdata.csv ./Music
     echo "Spotify data successfully fetched."
 elif [ ${spotify} == "n" ]
 then

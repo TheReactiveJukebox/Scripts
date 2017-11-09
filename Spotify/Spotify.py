@@ -23,7 +23,7 @@ def _authorize():
 delete_not_found = True
 
 if delete_not_found:
-    path = sys.argv[1]
+    path = sys.argv[2]
 
 # access_token = _authorize()
 access_token = "123"
