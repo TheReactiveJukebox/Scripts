@@ -4,7 +4,7 @@ mkdir "$outdir"
 
 duration=30 #output song duration
 
-FILES="Musik/*/*/*.mp3"
+FILES="Music/*/*/*.mp3"
 for f in $FILES
 do
 	filename="${f##*/}" #extract only filename
