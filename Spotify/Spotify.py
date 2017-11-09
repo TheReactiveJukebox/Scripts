@@ -65,7 +65,10 @@ for rownum, row in enumerate(csv_in):
     if len(search_data["tracks"]["items"]) == 0:
         not_found_counter += 1
         if delete_not_found:
-            os.remove(path + "/" + row[3][:1] + "/" + row[3][1:2] + "/" + row[3][2:])
+            try:
+                os.remove(path + "/" + row[3][:1] + "/" + row[3][1:2] + "/" + row[3][2:] + ".mp3")
+            except:
+                print("File not found: " + path + "/" + row[3][:1] + "/" + row[3][1:2] + "/" + row[3][2:] + ".mp3")
         else:
             csv_out.writerow((row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7],
                               row[8], row[9], row[10], row[11], row[12], row[13], row[14],
