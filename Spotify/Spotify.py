@@ -7,6 +7,8 @@ import requests
 import sys
 from oauthtool import implicit_flow
 
+range_from = 1
+range_to = 400
 
 def _authorize():
     # Start OAuth2 implicit flow
@@ -28,21 +30,13 @@ if delete_not_found:
 # access_token = _authorize()
 access_token = "123"
 
-csv_outfile = open("spotifydata.csv", "w", encoding="utf-8", newline="")
+csv_outfile = open("spotifydata.csv" + "_" + str(range_from) + "to" + str(range_to), "w", encoding="utf-8", newline="")
 csv_out = csv.writer(csv_outfile, delimiter=',')
 
 infile = sys.argv[1]
 
 csv_infile = open(infile, "r", encoding="utf-8")
 csv_in = csv.reader(csv_infile, delimiter=',')
-
-# bpm_dict = {}
-#
-# # read bpm from librosa
-# with open("bpm_all.csv", "r", encoding="utf-8") as csv_bpmfile:
-#     csv_bpm = csv.reader(csv_bpmfile, delimiter=',')
-#     for rownum, row in enumerate(csv_bpm):
-#         bpm_dict[row[0]] = row[1]
 
 not_found_counter = 0
 
@@ -53,6 +47,8 @@ for rownum, row in enumerate(csv_in):
                           'bpm', 'danceability', 'energy', 'loudness', 'speechiness', 'acousticness',
                           'instrumentalness', 'liveness', 'valence', 'spotifyurl', 'spotifyid'))
         continue  # next row
+    elif rownum < range_from or rownum > range_to:
+        continue
 
     search_request_param = {"access_token": access_token,
                             "q": row[0] + " " + row[1],
