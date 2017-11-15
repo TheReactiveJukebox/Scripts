@@ -54,9 +54,23 @@ for rownum, row in enumerate(csv_in):
                             "q": row[0] + " " + row[1],
                             "type": "track",
                             "limit": 1}
-    search_request = requests.get(constants.spotifyBaseUrl + "/search",
-                                  params=search_request_param)
-    search_data = search_request.json()
+
+    # Strangely, the Spotify API sometimes returns a 502 without any obvious reason, so in this case just try again
+    while True:
+        search_request = requests.get(constants.spotifyBaseUrl + "/search",
+                                      params=search_request_param)
+        search_data = search_request.json()
+
+        if "tracks" in search_data:
+            break
+
+        print("An error occurred, further information below:")
+        print("search_data: ")
+        print(search_data)
+        print("search_request: ")
+        print(search_request)
+        print("search_request_param: ")
+        print(search_request_param)
 
     if len(search_data["tracks"]["items"]) == 0:
         not_found_counter += 1
@@ -72,14 +86,24 @@ for rownum, row in enumerate(csv_in):
     else:
         track_id = search_data["tracks"]["items"][0]["id"]
         feature_request_param = {"access_token": access_token}
-        feature_request = requests.get(constants.spotifyBaseUrl + "/audio-features/" + track_id,
-                                       params=feature_request_param)
-        feature_data = feature_request.json()
 
-        # if abs(float(feature_data["tempo"]) - float(bpm_dict[row[3]])) > 20:
-        #     print("[1] CSV: " + bpm_dict[row[3]] + "BPM " + row[1] + " - " + row[0])
-        #     print("[2] Spt: " + str(feature_data["tempo"]) + "BPM " + search_data["tracks"]["items"][0]["artists"][0]["name"]
-        #           + " - " + search_data["tracks"]["items"][0]["name"])
+        while True:
+            feature_request = requests.get(constants.spotifyBaseUrl + "/audio-features/" + track_id,
+                                           params=feature_request_param)
+            feature_data = feature_request.json()
+
+            if "tempo" in feature_data:
+                break
+
+            print("An error occurred, further information below:")
+            print("feature_request: ")
+            print(feature_request)
+            print("feature_data: ")
+            print(feature_data)
+            print("track_id: ")
+            print(track_id)
+            print("search_request_param: ")
+            print(search_request_param)
 
         csv_out.writerow((row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7],
                           row[8], row[9], row[10], row[11], row[12], row[13], row[14],
@@ -87,6 +111,4 @@ for rownum, row in enumerate(csv_in):
                           feature_data["loudness"], feature_data["speechiness"], feature_data["acousticness"],
                           feature_data["instrumentalness"], feature_data["liveness"], feature_data["valence"],
                           search_data["tracks"]["items"][0]["preview_url"], search_data["tracks"]["items"][0]["id"]))
-
-
 print(not_found_counter)
