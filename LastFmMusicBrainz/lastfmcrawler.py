@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
+
+#Example Usage: python3 lastfmcrawler.py id3data.csv genres.csv
+
 import csv
 import json
 import time
@@ -28,6 +31,7 @@ track = 'Hells+Bells'
 
 # END EXAMPLES
 
+not_inflate_tags=['rock & roll']
 
 def normalizeTag(tagname):
     tagname = tagname.replace('-', ' ')  # rock-pop -> rock pop
@@ -42,20 +46,26 @@ def normalizeTag(tagname):
 def inflate_tags(tags):
     tags_new = []
     for t in tags:  # 'alternative rock'
+        if (t in not_inflate_tags):
+            continue #skip not_inflate_tags tags
         if type(t) is not str:  # some tags can be of type 'byte' (for example Oasis - Wonderwall)
             t = t.decode('UTF-8')  # decode byte to string
         tt = t.split(' ')  # ['alternative','rock']
+        if ('classic' in tt and len(tt)>1):
+            tt.remove('classic') #remove 'classic', if it was part of a genre like 'classic rock'
         tt += [t]  # ['alternative', 'rock', 'alternative rock']
+        tt = [x.rstrip() for x in tt]
         tags_new += tt
+
     return tags_new
 
 
 def correct_tags(tags):  # correct common spelling mistakes
     tags_correct = []
     search_for = ['electonic', 'r&b', 'electro swing', 'synth pop', 'ragga', 'synthie pop', 'genre: deep house',
-                  'rhythm and blues', 'hellektro', 'pbrnb', '1960s', '1970s', '1980s', '1990s', 'hiphop']
+                  'rhythm and blues', 'hellektro', 'pbrnb', '1960s', '1970s', '1980s', '1990s', '00s', 'hiphop', 'triphop', 'edm', 'psy trance']
     replace_with = ['electronic', 'rnb', 'electroswing', 'synthpop', 'reggae', 'synthpop', 'deep house',
-                    'rhythm & blues', 'aggrotech', 'alternative rnb', '60s', '70s', '80s', '90s', 'hip hop']
+                    'rhythm & blues', 'aggrotech', 'alternative rnb', '60s', '70s', '80s', '90s', '2000s', 'hip hop', 'trip hop', 'electronic dance music', 'psytrance']
     for t in tags:
         for sfindex, sf in enumerate(search_for):
             t = t.replace(search_for[sfindex], replace_with[sfindex])
@@ -101,8 +111,8 @@ notfound_mb_rank = 0
 notfound_mb_track_rank = 0
 
 for rownum, row in enumerate(csv_in):
-    # if rownum > 50:
-    # break
+    if rownum > 50:
+        break
 
     if len(row) <= 3:  # line too short
         continue
@@ -117,7 +127,9 @@ for rownum, row in enumerate(csv_in):
     album = row[2]
     songHash = row[3]
     length = row[4]
-    published = row[5] #not available for all
+    published=''
+    if (len(row)>5):
+        published = row[5] #not available for all
     print(str(rownum) + " t=" + str(round(time.time() - timestart)) + ": " + artist + " - " + title)
 
     apiParams = '&api_key=a8b40052edf6a8ce494429b0b3b10f91&artist=%s&track=%s&user=RJ&format=json' % (
@@ -280,7 +292,7 @@ genrecount_ordered_list = sorted(genrecount.items(), key=operator.itemgetter(1),
 with open('tags_out.csv', 'w') as genrefile:
     # print(genrecount_ordered_list)
     for tag in genrecount_ordered_list:
-        genrefile.write(str(tag[0]) + '\n')
+        genrefile.write(str(tag[0])+ ',' + str(tag[1]) + '\n')
 
 # print(genrecount_ordered_list)
 print('stats')
