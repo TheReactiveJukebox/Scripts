@@ -170,6 +170,7 @@ for row in data:
     genList = genList.replace("[", "")
     genList = genList.replace("]", "")
     genList = genList.split(",")
+    genList = [x.lstrip() for x in genList]  #remove leading whitespaces for each genre name
     for gen in genList:
         if gen in genres:
             cur.execute("EXECUTE connect_song_genre (%s, %s)", (songid, genres[gen]))
