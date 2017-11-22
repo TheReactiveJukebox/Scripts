@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+# -*- coding: UTF-8 -*-
+
 #pip3 install mutagen
 #run script w/ python3: python3 id3tocsv.py /media/user/path\ to\ mp3_files
 import os
