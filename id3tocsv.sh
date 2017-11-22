@@ -1,3 +1,3 @@
 #!/bin/bash
 
-python ./Id3ToCsv/id3tocsv.py ./Music
+python3 ./Id3ToCsv/id3tocsv.py ./Music
