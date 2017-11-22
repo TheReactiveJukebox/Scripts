@@ -111,8 +111,8 @@ notfound_mb_rank = 0
 notfound_mb_track_rank = 0
 
 for rownum, row in enumerate(csv_in):
-    if rownum > 50:
-        break
+    #if rownum > 50:
+    #    break
 
     if len(row) <= 3:  # line too short
         continue
@@ -280,12 +280,9 @@ for rownum, row in enumerate(csv_in):
     if len(album) == 0:  # no album in id3
         album = lfm_album  # use last.fm album (normally all mp3's have album names given)
 
-    try:
-        csv_out.writerow((title, artist, album, songHash, length, published, lfm_trackmbid, lfm_artistmbid,
+    csv_out.writerow((title, artist, album, songHash, length, published, lfm_trackmbid, lfm_artistmbid,
                           lfm_albummbid, lfm_playcount, lfm_listeners, lfm_albumcover, str(track_genres), mb_rating,
                           mb_track_rating))
-    except:
-        print('Can not write in csv_out file')
 
 # write all tags (one tag only once)
 genrecount_ordered_list = sorted(genrecount.items(), key=operator.itemgetter(1), reverse=True)
