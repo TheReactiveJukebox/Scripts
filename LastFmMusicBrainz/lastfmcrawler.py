@@ -155,6 +155,7 @@ for rownum, row in enumerate(csv_in):
     lfm_tags = []
     mb_another_tags = []
     mb_rating = ''
+    mb_track_rating = ''
 
     if 'track' not in result_info:
         notfound_track += 1
