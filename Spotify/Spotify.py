@@ -22,7 +22,7 @@ def _authorize():
     return auth_response["access_token"]
 
 
-delete_not_found = True
+delete_not_found = False
 
 if delete_not_found:
     path = sys.argv[2]
