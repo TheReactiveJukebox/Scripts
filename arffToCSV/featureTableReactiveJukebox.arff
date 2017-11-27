@@ -1,0 +1,56 @@
+% Table with all audio signal features available
+% for computation in Amuse. If you wish to use
+% some subset of features, please create a copy
+% of this file and leave only the features you
+% want to extract.
+
+@RELATION features
+
+% Unique feature ID
+@ATTRIBUTE Id NUMERIC
+% Feature description
+@ATTRIBUTE Description STRING
+% ID of tool to extract the feature (see extractorTable.arff)
+@ATTRIBUTE ExtractorId NUMERIC
+% Window size in samples
+@ATTRIBUTE WindowSize NUMERIC
+% Number of feature dimensions
+@ATTRIBUTE Dimensions NUMERIC
+% Indicates if the Attribute is suitable for Feature Matrix Processing. (1 = True, 0 = False)
+@ATTRIBUTE IsSuitableForFeatureMatrixProcessing NUMERIC
+
+@DATA
+
+% Timbre features
+
+0, "Zero-crossing rate", 0, 512, 1, 1
+4, "Root mean square", 0, 512, 1, 1
+6, "Low energy", 0, 512, 1, 1
+20051, "Tristimulus 2048", 2, 2048, 2, 1
+11, "RMS peak number in 3 seconds", 4, 66150, 1, 1
+20029, "Spectral irregularity 2048", 4, 2048, 1, 1
+20030, "Spectral bandwidth 2048", 1, 2048, 1, 1
+20033, "Spectral crest factor 2048", 1, 2048, 4, 1
+20034, "Spectral flatness measure 2048", 1, 2048, 4, 1
+20041, "Distances in phase domain 2048", 1, 2048, 1, 1
+
+% CMRARE
+45, "CMRARE cepstral modulation features with polynomial order 3", 2, 110250, 8, 1
+46, "CMRARE cepstral modulation features with polynomial order 5", 2, 110250, 12, 1
+47, "CMRARE cepstral modulation features with polynomial order 10", 2, 110250, 22, 1
+
+% Harmony and melody features
+
+20053, "Inharmonicity 2048", 4, 2048, 1, 1
+20055, "Major/minor alignment 2048", 4, 2048, 1, 1
+20056, "Strengths of major keys 2048", 4, 2048, 12, 1
+20057, "Strengths of minor keys 2048", 4, 2048, 12, 1
+20059, "Harmonic change detection function 2048", 4, 2048, 1, 1
+20037, "Spectral brightness 2048", 4, 2048, 1, 1
+
+% Tempo features
+
+410, "Characteristics of fluctuation patterns", 10000, 32768, 7, 1
+418, "Rhythmic clarity", 4, 66150, 1, 1
+420, "Estimated onset number per minute", 4, 229376, 1, 1
+
