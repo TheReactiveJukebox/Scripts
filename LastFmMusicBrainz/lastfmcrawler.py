@@ -111,8 +111,8 @@ notfound_mb_rank = 0
 notfound_mb_track_rank = 0
 
 for rownum, row in enumerate(csv_in):
-    #if rownum > 50:
-    #    break
+    #if rownum < 12260:
+        #continue
 
     if len(row) <= 3:  # line too short
         continue
@@ -213,7 +213,7 @@ for rownum, row in enumerate(csv_in):
         else:
             notfound_lfm_albumcover += 1
 
-        if 'tag' in result_tags['tags']:
+        if 'tags' in result_tags and 'tag' in result_tags['tags']:
             # lfm_tags = [x['name'].encode('UTF-8') for x in result_tags['tags']['tag']]  # list of tags
             lfm_tags = [x['name'] for x in result_tags['tags']['tag']]  # list of tags
         else:
