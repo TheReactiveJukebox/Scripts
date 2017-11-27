@@ -9,7 +9,8 @@ from oauthtool import implicit_flow
 
 import spotifySettings
 
-
+range_from = 20001
+range_to = 24000
 
 def _authorize():
     # Start OAuth2 implicit flow
@@ -23,9 +24,13 @@ def _authorize():
     return auth_response["access_token"]
 
 
+delete_not_found = True
+
 if delete_not_found:
     path = sys.argv[2]
 
+# access_token = _authorize()
+access_token = "123"
 
 csv_outfile = open("spotifydata.csv" + "_" + str(range_from) + "to" + str(range_to), "w", encoding="utf-8", newline="")
 csv_out = csv.writer(csv_outfile, delimiter=',')
