@@ -1,13 +1,12 @@
 import csv
 import logging
 import os
+import numpy as np
 
 import constants
 import requests
 import sys
 from oauthtool import implicit_flow
-
-import spotifySettings
 
 range_from = 0
 range_to = 100000000000
@@ -40,7 +39,7 @@ infile = sys.argv[1] #lastfmdata.csv
 csv_infile = open(infile, "r", encoding="utf-8") #lastfmdata.csv
 csv_in = csv.reader(csv_infile, delimiter=',')
 
-csvspotifyumlautbug_infile = open("spotifydata.csv_umlautbug", "r", encoding="utf-8") #umlautbugfix
+csvspotifyumlautbug_infile = open("Spotify/spotifydata.csv_umlautbug", "r", encoding="utf-8") #umlautbugfix
 csvspotifyumlautbug_in = csv.reader(csvspotifyumlautbug_infile, delimiter=',') #umlautbugfix
 existingspotifydata=[ x for x in csvspotifyumlautbug_in] #umlautbugfix  lines to array
 existingspotifydata=np.array(existingspotifydata) #umlautbugfix
@@ -62,7 +61,7 @@ for rownum, row in enumerate(csv_in):
     existingdata_indexfound=-1  #umlautbugfix
     for edi,ed in enumerate(existingspotifydata[:,0:3]):  #umlautbugfix
         exisintdatalinematch= (ed==row[0:3])  #umlautbugfix
-        if (np.all(exisintdatalinematch): #current index is line with this data  #umlautbugfix
+        if (np.all(exisintdatalinematch)): #current index is line with this data  #umlautbugfix
             existingdata_indexfound=edi  #umlautbugfix
 
     efd=existingspotifydata #shorten vairabled  #umlautbugfix
