@@ -18,24 +18,27 @@ csvoutpath=sys.argv[2] #'emotions.csv'
 allarousal=[]
 allvalence=[]
 
-arousalmin=0
-arousalmax=100
-arousalmin_translated=0
+arousalmin=10
+arousalmax=20
+arousalmin_translated=-1
 arousalmax_translated=1
 
-valencemin=0
-valencemax=100
-valencemin_translated=0
+valencemin=4.5
+valencemax=9
+valencemin_translated=-1
 valencemax_translated=1
 
 
 def printStatistics(datalist):
     print('max='+str(max(datalist)))
     print('min='+str(min(datalist)))
-    print('mean='+str(max(datalist)))
-    print('q 0.25='+str(np.percentile(datalist,25)))
-    print('q 0.5='+str(np.percentile(datalist,50)))
-    print('q 0.75='+str(np.percentile(datalist,75)))
+    print('mean='+str(np.mean(datalist)))
+    percentiles=[0.01,0.05,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,0.95,0.99]
+    for q in percentiles:
+        print('q '+str(q)+'='+str(np.percentile(datalist, (q*100) )))
+
+def clamp(n, minn, maxn):
+    return max(min(maxn, n), minn)
 
 def translate(value, leftMin, leftMax, rightMin, rightMax):
     leftSpan = leftMax - leftMin
@@ -44,6 +47,7 @@ def translate(value, leftMin, leftMax, rightMin, rightMax):
     return rightMin + (valueScaled * rightSpan)
 
 hashdirs=[x[0] for x in os.walk(directory)] #list of all directories in directory
+hashdirs=hashdirs[1:] #remove first entry, the directory itself
 
 with open(csvoutpath, 'w') as outfile:
     outfile.write('songHash' + ',' + 'arousal' + ',' + 'valence' + '\n')
@@ -67,7 +71,9 @@ with open(csvoutpath, 'w') as outfile:
             allarousal.append(arffarousal)
             allvalence.append(arffvalence)
             arousal=translate(arffarousal, arousalmin, arousalmax, arousalmin_translated, arousalmax_translated)
+            arousal=clamp(arousal,arousalmin_translated,arousalmax_translated)
             valence=translate(arffvalence, valencemin, valencemax, valencemin_translated, valencemax_translated)
+            valence=clamp(valence,valencemin_translated,valencemax_translated)
             outfile.write(songhash + ',' + str(arousal) + ',' + str(valence) + '\n')
 
 
