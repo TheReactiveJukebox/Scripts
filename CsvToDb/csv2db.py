@@ -86,6 +86,7 @@ data_file = sys.argv[1]
 genre_file = sys.argv[2]
 bpm_librosa_file = sys.argv[3]
 dynamics_librosa_file = sys.argv[4]
+emotions_file = sys.argv[5]
 
 genres = {}
 genre_in = open(genre_file, "r")
@@ -112,6 +113,16 @@ next(dynamics_data)
 for row in dynamics_data:
     dynamics_dict[row[0]] = float(row[1])
 dynamics_in.close()
+
+emotions_in = open(emotions_file, "r")
+emotions_data = csv.reader(emotions_in)
+predictedArousalDict = {}
+predictedValenceDict = {}
+next(emotions_data)
+for row in emotions_data:
+    predictedArousalDict[row[0]] = float(row[1])
+    predictedValenceDict[row[0]] = float(row[2])
+emotions_in.close()
 
 file_in = open(data_file, "r", encoding="utf-8")
 data = csv.reader(file_in)
@@ -161,9 +172,9 @@ for row in data:
     liveness = 0 if row[22] is "" else float(row[22])
     valence = 0 if row[23] is "" else float(row[23])
     cur.execute("EXECUTE insert_song (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
-                (titleNorm, row[0], albumid, row[3], int(row[4]), release_date, row[6], int(row[9]),
-                 int(row[10]), track_rating, bpm, danceability, energy, loudness, speechiness, acousticness,
-                 instrumentalness, liveness, valence, dynamics_dict[row[3]], row[24], row[25]))
+        (titleNorm, row[0], albumid, row[3], int(row[4]), release_date, row[6], int(row[9]),
+        int(row[10]), track_rating, bpm, danceability, energy, loudness, speechiness, acousticness,
+        instrumentalness, liveness, valence, dynamics_dict[row[3]], row[24], row[25],predictedArousalDict[row[3]],predictedValenceDict[row[3]]))
     songid = cur.fetchone()[0]
     cur.execute("EXECUTE connect_song_artist (%s, %s)", (artistid, songid))
     genList = row[12].replace("'", "")
