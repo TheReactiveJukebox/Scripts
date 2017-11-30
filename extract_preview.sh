@@ -47,7 +47,7 @@ do
 	 starttime=0
 	 #example 1/9/b8f2800f3e7eb7006b73b0a55079f5b8b804e6af7caf98ffacb7de0ce1bb19.mp3   27seconds
 	 #read temp
-  fi
+	fi
 
 	stminute=$((starttime/60))
 	stsecond=$((starttime%60))

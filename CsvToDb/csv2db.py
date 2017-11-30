@@ -60,8 +60,8 @@ cur.execute("PREPARE connect_artist_album AS "
 cur.execute("PREPARE insert_song AS "
             "INSERT INTO song (TitleNormalized, Title, AlbumId, Hash, Duration, Published, MusicBrainzId, Playcount, "
             "Listeners, Rating, Bpm, Danceability, Energy, Loudness, Speechiness, Acousticness, Instrumentalness, "
-            "Liveness, Valence, Dynamics, SpotifyUrl, SpotifyId) "
-            "VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22) "
+            "Liveness, Valence, Dynamics, SpotifyUrl, SpotifyId, MirArousal, MirValence) "
+            "VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24) "
             "RETURNING Id;")
 
 # connect song and artist
@@ -152,13 +152,16 @@ for row in data:
     cur.execute("EXECUTE insert_album (%s, %s, %s, %s)", (albumNorm, row[2], row[11], row[8]))
     albumid = cur.fetchone()[0]
     cur.execute("EXECUTE connect_artist_album (%s, %s)", (artistid, albumid))
-    if re.compile("\d*-\d*-\d*").match(row[5]):
-        release_date = datetime.strptime(row[5], "%Y-%m-%d")
-    elif re.compile("\d*-\d*").match(row[5]):
-        release_date = datetime.strptime(row[5], "%Y-%m")
-    elif row[5] is not "":
-        release_date = datetime.strptime(row[5], "%Y")
-    else:
+    try:
+        if re.compile("\d*-\d*-\d*").match(row[5]):
+            release_date = datetime.strptime(row[5], "%Y-%m-%d")
+        elif re.compile("\d*-\d*").match(row[5]):
+            release_date = datetime.strptime(row[5], "%Y-%m")
+        elif row[5] is not "":
+            release_date = datetime.strptime(row[5], "%Y")
+        else:
+            release_date = None
+    except ValueError:
         release_date = None
 
     track_rating = 0 if row[14] is "" else float(row[14])
@@ -171,10 +174,14 @@ for row in data:
     instrumentalness = 0 if row[21] is "" else float(row[21])
     liveness = 0 if row[22] is "" else float(row[22])
     valence = 0 if row[23] is "" else float(row[23])
-    cur.execute("EXECUTE insert_song (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
+    dynamics = 0 if row[3] not in dynamics_dict else dynamics_dict[row[3]]
+    mir_arousal = 0 if row[3] not in predictedArousalDict else predictedArousalDict[row[3]]
+    mir_valence = 0 if row[3] not in predictedValenceDict else predictedValenceDict[row[3]]
+    cur.execute(
+        "EXECUTE insert_song (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
         (titleNorm, row[0], albumid, row[3], int(row[4]), release_date, row[6], int(row[9]),
-        int(row[10]), track_rating, bpm, danceability, energy, loudness, speechiness, acousticness,
-        instrumentalness, liveness, valence, dynamics_dict[row[3]], row[24], row[25],predictedArousalDict[row[3]],predictedValenceDict[row[3]]))
+         int(row[10]), track_rating, bpm, danceability, energy, loudness, speechiness, acousticness,
+         instrumentalness, liveness, valence, dynamics, row[24], row[25], mir_arousal, mir_valence))
     songid = cur.fetchone()[0]
     cur.execute("EXECUTE connect_song_artist (%s, %s)", (artistid, songid))
     genList = row[12].replace("'", "")
