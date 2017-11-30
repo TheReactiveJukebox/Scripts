@@ -28,12 +28,11 @@ do
 	parentparentdir="$(dirname "$parentdir")" #musik/a/2 -> musik/a
 	hash1="${parentparentdir##*/}" #musik/a  -> a
 	fullhashfilename="$hash1$hash2$filename" #a/2/asdf.mp3 -> a2asdf.mp3
-	if $fullhashfilename in $outdir then
 
 	if `list_include_item "$EXISTINGFILES" "$f"` #if file already exists
-  then
-   continue #skip this file
-  fi
+	then
+		continue #skip this file
+	fi
 
 	echo "Processing $f"
 	echo "Hash=$fullhashfilename"
