@@ -1,9 +1,24 @@
 #!/bin/bash
+
+# list_include_item "10 11 12" "2"
+function list_include_item {
+  local list="$1"
+  local item="$2"
+  if [[ $list =~ (^|[[:space:]])"$item"($|[[:space:]]) ]] ; then
+    # yes, list include item
+    result=0
+  else
+    result=1
+  fi
+  return $result
+}
+
 outdir="previewMusik"
 mkdir "$outdir"
 
 duration=30 #output song duration
 
+EXISTINGFILES=$(ls $outdir/)
 FILES="Music/*/*/*.mp3"
 for f in $FILES
 do
@@ -13,6 +28,12 @@ do
 	parentparentdir="$(dirname "$parentdir")" #musik/a/2 -> musik/a
 	hash1="${parentparentdir##*/}" #musik/a  -> a
 	fullhashfilename="$hash1$hash2$filename" #a/2/asdf.mp3 -> a2asdf.mp3
+	if $fullhashfilename in $outdir then
+
+	if `list_include_item "$EXISTINGFILES" "$f"` #if file already exists
+  then
+   continue #skip this file
+  fi
 
 	echo "Processing $f"
 	echo "Hash=$fullhashfilename"
