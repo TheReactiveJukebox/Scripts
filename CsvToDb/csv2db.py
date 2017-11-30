@@ -60,8 +60,8 @@ cur.execute("PREPARE connect_artist_album AS "
 cur.execute("PREPARE insert_song AS "
             "INSERT INTO song (TitleNormalized, Title, AlbumId, Hash, Duration, Published, MusicBrainzId, Playcount, "
             "Listeners, Rating, Bpm, Danceability, Energy, Loudness, Speechiness, Acousticness, Instrumentalness, "
-            "Liveness, Valence, Dynamics, SpotifyUrl, SpotifyId) "
-            "VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22) "
+            "Liveness, Valence, Dynamics, SpotifyUrl, SpotifyId, MirArousal, MirValence) "
+            "VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24) "
             "RETURNING Id;")
 
 # connect song and artist
