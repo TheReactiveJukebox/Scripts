@@ -174,13 +174,14 @@ for row in data:
     instrumentalness = 0 if row[21] is "" else float(row[21])
     liveness = 0 if row[22] is "" else float(row[22])
     valence = 0 if row[23] is "" else float(row[23])
+    dynamics = 0 if row[3] not in dynamics_dict else dynamics_dict[row[3]]
     mir_arousal = 0 if row[3] not in predictedArousalDict else predictedArousalDict[row[3]]
     mir_valence = 0 if row[3] not in predictedValenceDict else predictedValenceDict[row[3]]
     cur.execute(
         "EXECUTE insert_song (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
         (titleNorm, row[0], albumid, row[3], int(row[4]), release_date, row[6], int(row[9]),
          int(row[10]), track_rating, bpm, danceability, energy, loudness, speechiness, acousticness,
-         instrumentalness, liveness, valence, dynamics_dict[row[3]], row[24], row[25], mir_arousal, mir_valence))
+         instrumentalness, liveness, valence, dynamics, row[24], row[25], mir_arousal, mir_valence))
     songid = cur.fetchone()[0]
     cur.execute("EXECUTE connect_song_artist (%s, %s)", (artistid, songid))
     genList = row[12].replace("'", "")
