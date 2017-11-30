@@ -152,13 +152,16 @@ for row in data:
     cur.execute("EXECUTE insert_album (%s, %s, %s, %s)", (albumNorm, row[2], row[11], row[8]))
     albumid = cur.fetchone()[0]
     cur.execute("EXECUTE connect_artist_album (%s, %s)", (artistid, albumid))
-    if re.compile("\d*-\d*-\d*").match(row[5]):
-        release_date = datetime.strptime(row[5], "%Y-%m-%d")
-    elif re.compile("\d*-\d*").match(row[5]):
-        release_date = datetime.strptime(row[5], "%Y-%m")
-    elif row[5] is not "":
-        release_date = datetime.strptime(row[5], "%Y")
-    else:
+    try:
+        if re.compile("\d*-\d*-\d*").match(row[5]):
+            release_date = datetime.strptime(row[5], "%Y-%m-%d")
+        elif re.compile("\d*-\d*").match(row[5]):
+            release_date = datetime.strptime(row[5], "%Y-%m")
+        elif row[5] is not "":
+            release_date = datetime.strptime(row[5], "%Y")
+        else:
+            release_date = None
+    except ValueError:
         release_date = None
 
     track_rating = 0 if row[14] is "" else float(row[14])
