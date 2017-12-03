@@ -41,10 +41,10 @@ featurenames=[   #["feature name",feature_id, feature_dimensions, preprocessing_
 ["Tristimulus 2048",20051,2,'mean'],
 ["RMS peak number in 3 seconds",11,1,'mean'],
 ["Spectral irregularity 2048",20029,1,'mean'],
-#["Spectral bandwidth 2048",20030,1,'mean'], #not available
-#["Spectral crest factor 2048",20033,4,'mean'],
-#["Spectral flatness measure 2048",20034,4,'mean'],
-#["Distances in phase domain 2048",20041,1,'mean'],
+["Spectral bandwidth 2048",20030,1,'mean'], #not available
+["Spectral crest factor 2048",20033,4,'mean'],
+["Spectral flatness measure 2048",20034,4,'mean'],
+["Distances in phase domain 2048",20041,1,'mean'],
 ["CMRARE cepstral modulation features with polynomial order 3",45,8,'mean'], #CMRARE
 ["CMRARE cepstral modulation features with polynomial order 5",46,12,'mean'],
 ["CMRARE cepstral modulation features with polynomial order 10",47,22,'mean'],
