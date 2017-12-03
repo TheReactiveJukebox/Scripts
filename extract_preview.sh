@@ -15,10 +15,11 @@ function list_include_item {
 
 outdir="previewMusik"
 mkdir "$outdir"
+seekdir="previewMusik"
 
 duration=30 #output song duration
 
-EXISTINGFILES=$(ls $outdir/)
+EXISTINGFILES=$(ls $seekdir/)
 FILES="Music/*/*/*.mp3"
 for f in $FILES
 do
@@ -29,13 +30,13 @@ do
 	hash1="${parentparentdir##*/}" #musik/a  -> a
 	fullhashfilename="$hash1$hash2$filename" #a/2/asdf.mp3 -> a2asdf.mp3
 
-	if `list_include_item "$EXISTINGFILES" "$f"` #if file already exists
+	if `list_include_item "$EXISTINGFILES" "$fullhashfilename"` #if file already exists
 	then
+		echo "Skipped $f"
 		continue #skip this file
 	fi
 
-	echo "Processing $f"
-	echo "Hash=$fullhashfilename"
+	echo "Processing $f Hash=$fullhashfilename"
 	l=$(mp3info -p "%S" $f)
 	#echo "Length=$l s"
 	starttime=$(( l/2 - duration/2))
@@ -55,6 +56,6 @@ do
 	etminute=$(( (starttime+duration)/60))
 	etsecond=$(( (starttime+duration)%60))
 	etsecond=$(printf "%02d" $etsecond) #add leading zero
-	echo "Use segment= $stminute:$stsecond - $etminute:$etsecond"
+	#echo "Use segment= $stminute:$stsecond - $etminute:$etsecond"
 	mp3cut -o "$outdir/$fullhashfilename" -t $stminute:$stsecond-$etminute:$etsecond $f
 done
