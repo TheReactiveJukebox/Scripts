@@ -7,6 +7,9 @@ if [ ${lastfm} == "y" ]
 then
     echo "Fetching data, this could take a few minutes..."
     python3 ./LastFmMusicBrainz/lastfmcrawler.py ./id3data.csv ./LastFmMusicBrainz/genres.csv
+    python3 ./LastFmMusicBrainz/sortgenres.py ./lastfmdata.csv ./LastFmMusicBrainz/genres.csv ./lastfmdata_sorted.csv
+    mv lastfmdata.csv lastfmdata_unsorted.csv
+    mv lastfmdata_sorted.csv lastfmdata.csv
     echo "LastFM data successfully fetchted."
 elif [ ${lastfm} == "n" ]
 then
