@@ -53,11 +53,13 @@ with open(inputfile, 'r') as inputdata:
                                 songgenres_sorted.append(sg) #add genre to output
 
                         c=str(songgenres_sorted) #convert back to string for csv
-                        c='"'+c+'"' #add " for the list as string in the csv
+
 
                     if ci>0:
                         outdata.write(',')
 
+                    if c.find(',')>=0:
+                        c='"'+c+'"' #add " to make it one entry in csv
                     outdata.write(c)
                 outdata.write('\n')
 
