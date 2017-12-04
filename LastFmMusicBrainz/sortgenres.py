@@ -40,6 +40,7 @@ with open(inputfile, 'r') as inputdata:
 
 
                 for ci,c in enumerate(row):
+                    c=c.replace('"','""') #replace " with double "", csv convention
                     if ci==genrecolumn: #at genres column
 
                         songgenres=c.replace('[','').replace(']','').replace('\'','').split(',')  #convert list-string to list
