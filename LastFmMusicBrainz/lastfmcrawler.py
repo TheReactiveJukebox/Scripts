@@ -262,7 +262,8 @@ for rownum, row in enumerate(csv_in):
     #tags = correct_tags(tags)  # correct typos
 
     #track_genres = [x for x in tags if x in genres]  # search for tags with a genre
-    track_genres= [x for x in tags] #use all tags
+
+    track_genres= [x for x in tags] #use all tags, intstead of filtering. Comment out this line if filtering is done during crawling
 
     track_genres = mbcyag.filter_genre_results(track_genres)  # filter out duplicates
 
