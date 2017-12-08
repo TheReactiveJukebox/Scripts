@@ -73,12 +73,15 @@ def correct_tags(tags):  # correct common spelling mistakes
     return tags_correct
 
 infile = sys.argv[1]
-genrefile = sys.argv[2]
 
-# read genres
-with open(genrefile) as f:
-    genres = f.readlines()
-    genres = [x.strip().lower() for x in genres]  # remove whitespaces and linebreakes and make lower case
+genres=[]
+if (len(sys.argv)>2):
+    genrefile = sys.argv[2]
+
+    # read genres
+    with open(genrefile) as f:
+        genres = f.readlines()
+        genres = [x.strip().lower() for x in genres]  # remove whitespaces and linebreakes and make lower case
 
 out = open("lastfmdata.csv", "w", encoding="utf-8", newline="")
 csv_out = csv.writer(out, delimiter=',')
@@ -254,12 +257,13 @@ for rownum, row in enumerate(csv_in):
         for x in mb_another_tags:
             tags.append(x)  # append musicbrainz tags to lastfm tags
 
-    tags = inflate_tags(
-        tags)  # inflate tags (also fix utf8 tags), example: 'alternative rock' -> 'alternative rock','alternative','rock'
-    tags = [normalizeTag(t) for t in tags]  # normalize tags. for example replace '-' by ' '
-    tags = correct_tags(tags)  # correct typos
+    #tags = inflate_tags(tags)  # inflate tags (also fix utf8 tags), example: 'alternative rock' -> 'alternative rock','alternative','rock'
+    #tags = [normalizeTag(t) for t in tags]  # normalize tags. for example replace '-' by ' '
+    #tags = correct_tags(tags)  # correct typos
 
-    track_genres = [x for x in tags if x in genres]  # search for tags with a genre
+    #track_genres = [x for x in tags if x in genres]  # search for tags with a genre
+    track_genres= [x for x in tags] #use all tags
+
     track_genres = mbcyag.filter_genre_results(track_genres)  # filter out duplicates
 
     if published=='':

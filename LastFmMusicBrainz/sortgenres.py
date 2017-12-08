@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #sorts the genres array in any csv with the genres column
-#usage: python3 sortgenres.py lastfmdata.csv genres.csv lastfmdata_sorted.csv
+#usage: python3 sortgenres.py lastfmdata.csv genres.csv genres_meta.csv lastfmdata_sorted.csv
 
 import csv
 import os
@@ -9,16 +9,29 @@ import numpy as np
 
 inputfile=sys.argv[1] #lastfmdata.csv
 genresfile=sys.argv[2] #genres.csv
-outpath=sys.argv[3] #outputcsv.csv
+metagenresfile=sys.argv[3] #genres_meta.csv
+outpath=sys.argv[4] #outputcsv.csv
 genres=[]
+metagenres=[]
 
-with open(genresfile, 'r') as genresdata:
+with open(genresfile, 'r') as genresdata: #all genres
     csvgenres=csv.reader(genresdata)
-    for genre in csvgenres:
+    with open(metagenresfile, 'r') as metagenresdata: # all metagenres (subset of genres)
+        csvmetagenres=csv.reader(metagenresdata)
+        for mg in csvmetagenres:
+            metagenres.append(mg) #all metagenres to list
+
+    for genre in csvgenres: #for every listed genre
+        if genre not in metagenres: #only subgenres
+            genre=genre[0]
+            genres.append(genre)
+
+    for genre in metagenres: #for every listed metagenre
         genre=genre[0]
-        genres.append(genre)
+        genres.append(genre) #append metagenres to the end (lowest priority)
 
 print(str(len(genres))+' genres found')
+
 
 
 csvheader=''
@@ -48,10 +61,10 @@ with open(inputfile, 'r') as inputdata:
 
                         #sort genres by genres-list
                         songgenres_sorted=[]
-                        for sg in genres: #go through all sorted genres
+                        for cg in genres: #go through all sorted genres
 
-                            if sg in songgenres:
-                                songgenres_sorted.append(sg) #add genre to output
+                            if cg in songgenres:
+                                songgenres_sorted.append(cg) #add genre to output
 
                         c=str(songgenres_sorted) #convert back to string for csv
 
@@ -63,5 +76,3 @@ with open(inputfile, 'r') as inputdata:
                         c='"'+c+'"' #add " to make it one entry in csv
                     outdata.write(c)
                 outdata.write('\n')
-
-    #outdata.write('\t('+str(nd_id)+', '+str(nd_genre)+', '+str(nd_metaid)+'),\n')
