@@ -42,12 +42,14 @@ cur.execute("TRUNCATE TABLE album CASCADE; TRUNCATE TABLE artist CASCADE; TRUNCA
 cur.execute("PREPARE insert_artist AS "
             "INSERT INTO artist (NameNormalized, Name, MusicBrainzId, Rating) "
             "VALUES ($1, $2, $3, $4) "
+            "ON CONFLICT (NameNormalized) DO UPDATE SET NameNormalized = EXCLUDED.NameNormalized "
             "RETURNING Id;")
 
 # insert album
 cur.execute("PREPARE insert_album AS "
             "INSERT INTO album (TitleNormalized, Title, Cover, MusicBrainzId) "
             "VALUES ($1, $2, $3, $4) "
+            "ON CONFLICT (TitleNormalized) DO UPDATE SET TitleNormalized = EXCLUDED.TitleNormalized "
             "RETURNING Id;")
 
 # connect artist and album
